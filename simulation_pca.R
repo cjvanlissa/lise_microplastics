@@ -1,7 +1,7 @@
 library(psych)
 seed <- 57432
 n = 200
-K = 10
+K = 100
 
 sim_results <- replicate(K, {
   true_class <- factor(sample(c("fragment", "flake"), n, replace = TRUE))

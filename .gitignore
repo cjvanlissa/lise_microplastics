@@ -7,3 +7,6 @@
 *.pdf
 *.log
 *.tex
+*.dat
+*.inp
+*.out

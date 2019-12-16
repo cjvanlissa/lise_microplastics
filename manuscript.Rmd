@@ -1,0 +1,348 @@
+---
+title             : "Rethinking microplastics: mapping the continuous and interrelated nature of shape, size and density of marine plastics in distributions"
+shorttitle        : "Rethinking microplastics"
+
+author: 
+  - name          : "Lise Alkema"
+    affiliation   : "1"
+    corresponding : yes
+    address       : "Postal address"
+    email         : "my@email.com"
+  - name          : "Caspar J. van Lissa"
+    affiliation   : "2"
+  - name          : "Merel Kooi"
+    affiliation   : "1"
+  - name          : "A. A. Koelmans"
+    affiliation   : "1"
+
+affiliation:
+  - id            : "1"
+    institution   : "Wageningen University"
+  - id            : "2"
+    institution   : "Utrecht University, department of Methodology & Statistics"
+
+authornote: |
+  Add complete departmental affiliations for each author here. Each new line herein must be indented, like this line.
+
+  Enter author note here.
+
+abstract: |
+  Plastic debris is omnipresent in the marine environment, spurring public and academic attention for the possible risks the material poses for marine life. Current methods for mapping shape, size and density use pre-determined categorizations. These are less well suited to provide information detailed enough for successful risk assessment. Here, we compares pre-distinct categorization with a novel method for mapping shape, size and density of plastics in marine waters, promoting the use of a universally applicable method for capturing the heterogeneous and continuous nature of marine plastics through continuous distributions. Data from a research cruise in the Atlantic was first analysed and classified in pre-determined categories of size and shape. Subsequently, polymer type, size and shape per particle were measured and plotted through continuous distributions. Plotted continuous distributions were compared with pre-determined categories and with classes statistically deriving from the data. It was found that by presenting size, shape and density in continuous distributions, information could be presented that far exceeded the  information provided by pre-determined categorization: pre-determined categorization such as the category ‘microplastics’, either excludes or renders invisible particles possibly important for risk assessment. However, distributions created were intrinsically interlinked with classes existing within the data. These classes showed that pre-determined categories can be improved and that they should not be ignored. Hence, categorization should not be dismissed as ‘inadequate’ and their inherent presence in marine plastics should be acknowledged, albeit after mapping the continuous and heterogeneous nature of marine plastics in continuous distributions.
+  
+keywords          : "microplastics, plastic, maritime, mixture model"
+wordcount         : "X"
+
+bibliography      : ["r-references.bib"]
+
+floatsintext      : no
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+linenumbers       : yes
+mask              : no
+draft             : no
+
+documentclass     : "apa6"
+classoption       : "man"
+output            : papaja::apa6_pdf
+---
+
+```{r setup, include = FALSE}
+library("papaja")
+source("setup.r")
+source("clean_data.r")
+```
+
+```{r analysis-preferences}
+# Seed for random number generation
+set.seed(42)
+knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
+```
+
+The persistence of plastic debris in our marine environment potentially constitutes threats to a multitude of life forms existing in the ocean, maybe even to whole marine ecosystems (Jahnke et al., 2017; Rochman et al., 2016; Sharma et al., 2017; Thiel et al., 2018;). This concern has given rise to numerous research initiatives that aim to map the amount, characteristics and behaviour of plastics that leak or have already leaked into the marine environment (Villarubia-Gomez et al, 2018; Law, 2016). Simultaneously, the potential risk associated with marine debris, and especially of particles with a length smaller than 5mm, also called ‘microplastics’ has sparked policy initiatives worldwide aiming to reduce plastic littering (Xanthos, 2017; Haward, 2018; Vince & Hardesty 2017; Willis et al., 2018, 2018, UNEP, 2018; European Commission, 2016).
+
+However, despite the multitude of research efforts undertaken, it is hard to get an overall idea of the actual ‘risk’ of marine plastics (Mendenhall, 2018; Koelmans et al., 2017; Villarubia-Gomez et al., 2018). To what extent are plastics influencing marine life? How close are we to an ecosystem collapse? Confusion in this area is due to a lack of clear, unbiased and aligned information, which currently causes a high amount of uncertainty regarding possible risks (Koelmans et al., 2017, Rochman et al., 2016). Besides, the term risk is proven to be ambiguous and multi-interpretable. Actors from the public, private and scientific domain maintain different views on what constitutes a risk and what risks are acceptable (SAPEA, 2019). 
+
+Ambiguity and uncertainty can be reduced by defining quantitative probability judgements – precisely quantified information. This information can then guide informed policy and decision-making (SAPEA, 2019). In current research, data on marine plastics is presented in the form of pre-distinct categories of a qualitative nature; descriptive categories of size (nanoplastics, microplastics, macroplastics), shape (fragment, film, foam, pellet, line) or density (polymer type identification – like Polyethylene (PE), Polypropylene (PP) or Polystyrene (PS)). Some information exists on particle size frequency, in which particle size, defined by the length of a particle, is often binned in subclasses. For shape and density any information on heterogeneity and overlap within and between the classes is absent. Hence, current methods effectively describe and visualize characteristics of marine plastics, however, they are limited in providing quantifiable information on the heterogeneity within these pre-distinct categories or size classes. Furthermore, methods used for data sampling and visualisation in the relatively young field of marine plastic research are fragmented, making it hard to compare and contrast available data (Kooi & Koelmans, 2019, Koelmans et al., 2017). 
+
+A uniformed method of sampling and analysis is necessary which offers a way to describe data while providing necessary information to define quantitative probability judgements. Kooi and Koelmans (2019) propose a novel method for mapping environmental (micro)plastic size, shape and density. It is proposed to step away from discrete classifications and to map characteristics of plastics through the use of continuous distributions. Besides capturing the heterogeneous nature of plastics, (parametrizations of) these distributions allow for ‘easy comparison between studies, irrespective of laboratory or sampling setups’ and ‘will be helpful in [probabilistic] risk modelling’ (Kooi & Koelmans, 2019). However, Kooi and Koelmans only considered microplastics (which is a size category) and assumed an absence of correlation between size, shape and density. From this it follows that more information is needed on the nature of distributions for plastic exceeding the microplastic limit of 5mm. Furthermore, information is required on the possible relationships between the different variables. Finally, it is needed to assess how these distributions relate to distinct categorization and whether current categorization can be improved, as categorization is still a useful tool in visualizing marine plastics and making distributions tangible. 
+
+This research aims to contribute to an enhanced understanding of best methods for mapping the heterogeneity of marine plastics in the most suitable way for defining quantitative probability judgements (through probabilistic risk modelling). It first present findings on shape, size and density of marine plastic debris sampled from surface waters of the Atlantic, mapped using pre-distinct size, shape and density categories. Then it compares this method of categorization for size and shape with created continuous density distributions based on the method of Kooi and Koelmans. Additionally it statistically test the data for the existence of groups, hereby assessing the validity of currently used categorization and exploring the possibility to derive statistics based classifications. It assesses what happens when letting go of pre-distinct categorization and let the data speak freely. How does this relate to our created distributions? Finally, it tests the assumption of no relationship between shape, size and density. 
+In sum, the validity of the model proposed by Kooi and Koelmans is tested for the elimination of categorization of size ‘microplastics’, the assumption of no relationship and for the idea of ‘stepping away’ from distinct size classifications. By doing this, it shines new light on the continuous nature of microplastics, re-assesses current classification of microplastics with a distinct size limit and shows how information from distributions can be made tangible by looking at classifications statistically deriving from the data.
+
+
+# Methods
+
+## Sample locations, hydrography and subsample selection
+
+Samples were collected along a route traversing the Atlantic ocean from South Africa (Cape Town) to Norway (Stavanger). A 500 $\mu$m meshed Manta Trawl with an aperture of 15x85cm was used which was for each sample towed outside the wake of the ship for 1 hour. Maximum boat speed for reliable sampling was set on 5 knots an hour. The project contained elements of ‘citizen science’: sampling took place aboard a sail training ship which allowed taking samples along their predestined route. Sampling activities were a combined effort of researchers and sail trainees.  
+
+A total of 40 samples have been collected, of which 20 in the South Atlantic and North Equatorial Current and 20 in the remaining part of the North Atlantic. On the ship, information was gathered on abundancy of microplastics (length < 5mm) plastics and macroplastics (length > 5mm) plastics and abundancy of shape categories (‘fragment’, ‘film’, ‘line’, ‘pellet’, ‘foam’). 
+
+For mapping distributions, a subsample of Ns = 20 samples was selected. All 20 samples were located in the North Atlantic, the majority being from the centre of the North Atlantic gyre and a minority from the North Atlantic Current and the North Sea (see Fig. 1). These had the highest relative abundancy, highest sample density and highest reliability, controlling for external influences of sea state, wind state and boat speed (Section S1). The selection of samples together accounted for 6574 particles (total particles for all samples = 6819). 
+
+## Sampling method & quality control
+
+After towing, the net was taken out of the water and rinsed with seawater from the outside of the opening towards a detachable cod-end, also meshed 500 cod-end $\mu$m, its content being emptied in a bucket and filtered through a 1mm sieve to allow for visual inspection (Lenz et al., 2015, Rocha-Santos et al., 2015). From the sieve, particles were picked by hand aided by tweezers and magnifying glasses. Sometimes the net was obstructed by seaweed or by jellyfish and Syphonophores. In this case the full content of the manta net was dumped in a bucket, after which we manually sorted through all seaweed, carefully placing each piece in seawater and checking thoroughly for remaining plastics before discarding. When confronted with jellyfish, a similar method was maintained, removing all jellyfish from our sample before filtering through the 1mm sieve. The sieve was always rinsed in a bucket of seawater, in which remaining particles were detected. Considering the contamination of organic matter and our manta net mesh of 500 $\mu$m, some particles between 0.5mm and 1mm might well have been captured in our 1mm sieve. However, we considered particles with a length <1mm not reliable and eliminated these from the analysis.
+
+After sieving and manually sorting, particles were dried and separated from organic matter. In most cases, it was rather easy to see the difference between organic matter and plastic. Only ‘film’ was tricky, as some seaweed produces a material that looks similar to plastic film. To check and confirm our findings based on visual inspection, plastic of the selected subsample were thoroughly identified using infrared spectroscopy (Lenz et al., 2015). For these samples, the visual method turned out to be rather accurate (in 20 samples, with a total 6819 particles, 135 i.e. 2% of the particles were identified as ‘other than plastic’). After separating plastics from organic matter, all particles were dried, counted and categorized into size classes under 5mm (microplastics) and over 5mm (macroplastics), as well as in shape classes: fragment, foam, film, pellet and line. Hereafter, particles were packed in paper or aluminium foil and stored in a cool, dry place to avoid biofouling. 
+
+## Laboratory analysis for selected subsample (Ns = 20)
+
+### measuring polymer type for density
+
+Per sample, particles were weighted and sieved through a 5mm, 2mm, 1mm stainless steel sieve. For each size class, an analysis was applied to identify polymer type and to filter out remaining organic matter. We aimed to gain information on particle size and polymer type on an individual  particle basis. Our total amount of particles was high and to speed up the process, we strived for maximum efficiency by using a combination of spectroscopic techniques, namely Near Infrared Spectroscopy (NIR) and Fourier Transform Infrared Spectroscopy with Attenuated Total Reflection (FTIR-ATR). The NIR technique is fast but less accurate, yet accurate enough for larger particles. The FTIR-ATR technique is more accurate and was therefore needed for smaller particles and film, which the NIR technique could not recognize. Yet this method is more laborious (Thermo Scientific; Sustar et al., 2014). In general, black particles were excluded for the analysis, as infrared has trouble reflecting black colours.
+
+NIR: all particles were first analysed using the sIRoPad GUT 04e (GUT Environmental Technologies) and IoSys sIRo (Dr. Timur Seidel e.K). An infrared laser scans a surface, identifies particle within the surface, linking its spectrum to a predetermined library of the main polymer types PE, PVC, PP, PS, PA and PET. After polymer identification, particles were categorized per sample and respectively per polymer type or as unidentified. 
+
+FTIR-ATR: particles not identified with NIR were analysed with the Bruker FTIR Compact Spectrameter ALPHA II. These particles were mostly ‘film’ and particles <1.5mm. Individual particles were placed on a one-reflection diamond of the ATR accessory, pressed onto a crystal. Before each measurement, surfaces were cleaned with ethanol. Spectra were produced with six scans, and subsequently analysed with the OMNIC™ Picta Software (Thermo Fisher Scientific), comparing spectra with several polymer type identification libraries (Section S2). For time-efficiency, when a sample exceeded 50 particles, only the first 50 particles were analysed, after which the results were extrapolated.
+
+Actual density could not be measured, therefore density was approached by transforming values of polymer type to corresponding densities (Kooi & Koelmans, 2019; Li et al., 2017) (Section S.1.3). However, as almost all fragments were of a buoyant polymer type (PE or PP, with a very minor part being PS, PVC or PA), density values were so similar that creating a density distribution was considered irrelevant. Instead, we chose to keep current categorization of polymer type in the forthcoming analysis.
+
+### measuring size and shape (imageJ)
+To capture the continuous size of particles, we measured the longest dimension (length) of the particle. For capturing the continuous nature of shape, the ‘Corey Shape Factor’ (CSF) has been calculated. 
+This factor captures the 3D aspect of plastics with the following formula: 
+
+$CSF = \frac{Height}{\sqrt{Length*Width}}$
+
+Resulting values vary between zero and one, with zero indicating very flat particles, and one indicating perfectly round particles (Kooi & Koelmans, 2019). 
+
+Data on length and width has been obtained by photo analysis in ImageJ, a powerful 2D photo analysis program (Schneider et al., 2012). Per sample, particles were photographed per size category and their respective polymer type classification. In this way, per particle, data on length and width could be linked to polymer type. Considering the destructibility of particles using FTIR-ATR, for those particles a photo was first acquired, after which the FTIR-ATR analysis was conducted following the exact order of particle position on the photo. Hence size could be linked to polymer type and organic matter could be extracted.  
+
+ImageJ’s ‘analyze particles’ tool  has been used, performing a particle size analysis per photo measuring Ferrets diameter per particle. Ferrets diameter (see Fig. 3) was considered the best available approximation of length and width in comparison with ‘bounding rectangle’ and ‘fit ellips’, the two other available tools for approximating size that were considered. This followed from a simple test of measuring 6 particles with differing positions 10 times using the manual measurement tool (to approximate the desired measurement of length and width) and comparing mean results per particle with the three parameters (Section S3). 
+
+To speed up the measuring process, ImageJ particle analysis was automated using the ImageJ Macro Plugin created by Mutterer & Rasband . To enable automation, all photos were taken with a stative from the exact same height with standardized conversion of 13 pixels per mm, determined through manual measurement in ImageJ of a photographed scale. 
+
+Height of particles (Section S4) is impossible to measure in most available programs. For >5 mm it was possible to measure height manually, using a ruler. For <5 mm height has been approximated according to the following methods: 
+
+* Following Koelmans & Kooi (2019) and Simon et al. (2018), for category ‘fragments’, ‘foam’ and ‘pellet’ it is assumed that length : width = width : height (L:W=W:H). 
+* For category ‘film’ and height of 10 particles were photographed through a scaled microscope and measured in ImageJ. The average height for ‘film’ was 0.009 mm, and was applied to all particles with category ‘film’. 
+* For line, 10 particles were photographed and measured. The cylindrical shape of fibres result in width being equal to height. As such, the mean value of 0.42 mm was applied to all line for both width and height.  
+
+Measuring height using a ruler is time consuming and tricky. For the sake of future research, we tested if the L:W=W:H assumption also works for fragments >5mm, which would greatly ease measuring height values of particles >5mm. We found that distributions were similar but slightly underrepresented fragments with a CSF between 0.1 & 0.3 (Section S5.1). These fragments often have a relatively large length and width, but a small height. We called these fragments  ‘flakes’.
+
+We obtained information per particle with a size larger than >1mm data on length category (<5mm microplastics and >5mm macroplastics), actual length, shape categories ‘foam’, ‘film’, ‘fragment’, ‘pellet’ and ‘line’, shape factor (CSF) and polymer type.
+
+### Measuring distributions and correlations
+
+For distributions, density plots were created for CSF and Length. The ggplot package in Rstudio, creates density plots using a kernel density estimate (non-parametric) for showing the probability density function of a variable (RStudio, 2018). Its method is comparable with a frequency histogram, however, without classifying data into distinct categories, thus capturing the heterogeneous and continuous nature of a variable detailed and accurate (Kabacoff, 2018). The combined influence of shape, density and length can provide input for risk models on  marine plastics. Defining parameters is necessary to combine the data of these variables in models, therefore it was aimed to create distributions fit for smoothing and parameter fitting (Kooi & Koelmans, 2019). Similarly, it is of essential important to assess relationship between the variables, as this influences the way in which data can be modelled. Kooi & Koelmans (2019) assume and absence of correlation. This assumption is tested. 
+
+Distributions were compared with data on categories of size, shape and polymer type. A linear regression analysis was performed, testing for a relationship between distributions and categories. Hereafter, the data was checked for groups (classes), using a latent profile analysis (LPA, Rstudio ). This is a statistical modelling approach for estimating distinct profiles or groups within variables. These classes were first tested for a relationship with shape categories and size categories and then analysed for interrelationships, using chi-square tests. In this way it was possible to test the following: 
+
+1. what classes exist within the data, and can we use current shape and size classifications to describe them? 
+2. how are these classes related to distributions? 
+
+Three apparent classes within the data for each distribution of length and CSF were found and showed a relationship, meaning that the length distribution is influenced by classes within the CSF distribution and vice versa. As this interrelationship influences the reliability of correlation tests, length and CSF distributions were plotted per class. Subsequent correlation tests were performed to test for a relationship between length, CSF and polymer type. 
+
+Distributions have been plotted for each sample, per current (centre of North Atlantic, North Atlantic Current and North Sea) and in total (Section S5.2). The total distribution was mainly influenced by samples from the centre of the North Atlantic gyre, diverging distributions being from much lesser densities found of particles in the North Atlantic gyre and the North Sea. Therefore the overall distribution was only considered representative for the centre of the North Atlantic gyre.
+
+As we aimed to test and improve data visualization on the base of creating most realistic distributions for marine plastics, fitting the distributions and defining parameters for probabilistic risk modelling was considered beyond the scope of this research. 
+
+<!--
+## Data analysis
+We used `r cite_r("r-references.bib")` for all our analyses.
+-->
+# Results
+
+## Plastic abundancies and categorization 
+
+Total abundancies per sample were plotted as total count per sample and of gram per litre (see Fig. 4). The blue histogram shows total count of particles per sample, measured for all samples, the yellow line showing density in grams per litre, measured for our selected subsample Ns = 20. We see a concentration of large abundancies in a few samples, when crossing right through the middle of the centre of the North Atlantic (close to the Azores) and a very low concentration in the South and North equatorial (counter) currents. Highest abundancies were 1.4 particles per litre, with lowest being 0 particles per litre. Highest abundancies for Ns = 20 is 3.9 grams/litre,  with lowest being 0.007 grams/litre.
+
+The vast majority of particles (80%) in our selected subsample Ns = 20 fall into respectively the <5mm ‘microplastic’ size class category and ‘fragment’ (81%) shape category, followed by ‘film’ (11%) and ‘line’ (7%) (Section S6). Relatively few particles categorized as pellet’ (0.2%) and ‘foam’ (Styrofoam, 0.06%)  were present. For polymer type, most particles were PE (polyethylene, 88%), followed by PP (polypropylene, 8.9%), and category ‘other’ (2.8%). This last category contained a few particles identified as PS (polystyrene), PVC and PET and some undetermined polymers (Section S7). Undetermined polymers were identified as such when its ATR spectrum showed a high match with several different polymers at the same time. In most cases these particles were of category ‘film’, and polymers in this category seemed to be matching additives/coatings. Among samples, the ratio’s between PE, PP and other were similar.
+
+## Approaching actual sizes and shapes through continuous distributions 
+Figure 5 presents density distributions for size (length) and shape (CSF) of analysed particles. The distributions show a frequency distribution of the actual data and are not fitted. Length and CSF values for different categories are represented by colours. Plotted density distribution for size presents a right skewed bimodal density distribution,  showing a peak at log(1) (2.73mm) and two shoulders at log(1.6) and log(3), with a minimum of 1mm, a mean 1.13 mm, a standard deviation of 0.7 and a maximum of 123 mm. Checking for outliers, we see that the majority of our data falls within a 0 -10 mm range, and that only a few particles have a length larger than 60 mm. Plotting CSF, the density distribution results in a multimodal distribution, with three peaks respectively at CSF values of 0.001, 0.16 and 0.61 with a mean of 0.48 and standard deviation of 0.25. 
+
+It was found that plotted density distributions were related to pre-distinct shape categories of film, foam, fragment, pellet, line, which however do not completely explain the variance in size or shape (R2 of 0.4 for size, R2 of 0.6 for shape, Section S9.1 & S9.2). Furthermore, the density distributions change when selecting size class microplastics (Fig. 5c, 5d). Shape category ‘line’ disappears in both distributions. Thus, pre-distinct categorization shows a relationship with length and shape distributions in which size selection ‘microplastics’ plays a defining role in determining the shape of distributions and particles represented. Furthermore, a large heterogeneity is seen in values within shape categories, which especially counts for ‘fragments’. It clearly shows how distributions can capture heterogeneity of marine plastics better than pre-distinct shape categories.
+
+Kooi & Koelmans (2019) fit parameters on their plotted frequency distributions which they combine for shape, size and density in a probabilistic risk model. To do this, it is assumed that no relationship exists between the variables shape, size and density. Testing for correlation between shape and size (see Fig. 6), we find that correlation is influenced by shape categories (Section S9.1). The almost perfect line created by ‘line’ and its relatively large influence on size in comparison with other categories, points at correlation tests being unreliable.  Hence, these distributions for shape and size in their current form, should not be tested for correlation. Nor is it advisable to smoothen the length distribution for parameter fitting as smoothing would mean that this information might be overlooked.
+
+Instead, the shape of our created distributions and their relationship with categories within the data is explored further by a latent class analysis, which can shine light onto 1) the validity of current shape and size classifications 2) which classes in the data cause an interrelationship between length and CSF distribution 3) how to create distributions that are not influenced by interrelated classifications. 
+
+### Data-derived classification to gain insight in the validity of current shape classification
+
+Performing a latent class analysis resulted in the total distributions of length and CSF being deconvoluted by finding subdistributions via deconvoluted peaks. Using a criterion of best fit resulted in three classes fitting best for each distribution (See Fig. 7a, 7c). 
+
+High chi square tests ($\chi^2 = 9681$ for CSF, Chi2 = 3211 for length, see Section S.2.2.3)) indicate that found classes can be related to shape and size categories (see Fig 7b, 7c). Excluding foam and pellet (due to their low abundancy), it was found that: 
+
+*	Length class 1 and 2 consist mostly of ‘fragments’ and ‘film’, whereas length class 3 consists mostly of ‘line’. CSF class 1 consists mostly of ‘film’, class 2 of ‘film’ and ‘fragment’, and class 3 of ‘fragments’ (Section S8.1 & S8.2). 
+*	Different shape categories do not solely define classes. Length shows for each class a combination of categories, as does CSF (for class 2 ‘line/flake’). It is apparent that category ‘fragment’ is too homogenous. Particles in CSF class 2 ‘line/flake’ are defined by a differing ratio between length, width and height. These fragments either have a low height or have a low width compared with a relatively high length (median = 6 compared to median = 2.81 for class 3). These particles are here classified as ‘flakes’. 
+* When selecting size class ‘microplastics’, CSF class 2 ‘flake/line’ disappears. This indicates that particles with a longer length but smaller height or width are excluded from any analysis. 
+
+### Data derived classification to gain insight in the interrelated shape of plotted density distributions
+
+Classes within the data appear to show a relationship. As was indicated by above regression analysis showing the influence of shape categories on the relationship between shape and size, a similar relationship was apparent for classes (chi2 = 2677, 9, Section 8.3). Interrelatedness between length and CSF is  mostly influenced by the relationship between length class 3 ‘line/fragment/film’ and CSF class 2 ‘flake’. It is this relationship that prohibits correlation tests and parameter fitting. Indeed, the long length of ‘line’ and larger pieces that make up flakes cause the right skewness of the length distribution, thus causing unreliable correlation tests. Fitting parameters would ignore this. 
+
+This finding is confirmed when testing for microplastics only (see Fig. 8). The interrelationships between classes reduced dramatically (chi2 =152.2, Section 8.4), indicating that the relationship between length and CSF distributions is not influenced by the existence of interrelated classes. Hence, for these distributions, parameter fitting and correlation tests are possible.
+
+## Creating most representative distributions while avoiding interrelatedness of classes
+
+To avoid interrelatedness of classes and exclusion of particles while approaching most realistic and representative distributions for shape and size, distributions are created per CSF class. In this way, a CSF distribution and a length distribution can be created based on the existence of found classes within the data, hereby avoiding the influence of interrelated classifications within distributions and avoiding a possible misrepresentation of heterogeneity of marine plastics caused by using shape categories as a base for creating new distributions.
+
+These distributions represent all CSF and length clusters, while minimizing the influence of a relationship between different shape clusters and length. These are thus being suitable for smoothing and parameter fitting and correlation tests.
+
+## Correlations between size, shape and polymer type
+
+The normal shape of these distributions allows for regression analysis between length and each CSF group, seeing if within the three distributions we find an effect of CSF on length and of polymer type on length or CSF.  
+
+* A Pearson’s Rho test (Section S10.1) for CSF class 1 (‘film’) showed a significant negative relationship between length and CSF, meaning a smaller length resulting in a larger CSF (rho = -0.97). Considering the equal height of all film, this points at smaller film being more squared and larger film being less squared. 
+* A correlation test (Section S10.2) for CSF class 2 (‘line/flake’) is problematic, due to the equal width and height of line. It is paramount that length influences CSF, as variation in CSF values is dependent on length. For ‘flakes’, a correlation test is possible (Section S10.2.1), resulting in a significant negative relationship, however with a low R2 of 0.18, meaning that most of the variance in length is explained by other factors than CSF. 
+* A correlation test (S10.3) for length and CSF class 3 (‘fragments’) shows a negative relation (coefficient = 5.15, R2 = 0.056, indication almost an absence of a relationship.
+* A correlation test (S11) for respectively length, CSF and polymer type indicate that polymer type has no influence on CSF nor length. 
+
+Subsequently, for each length distribution, CSF value seems to have a slight effect on length, indicating an existent but weak relationship between length and CSF for each CSF cluster, with polymer type having no effect. 
+
+# Discussion
+
+## Plastic abundancies and categorization 
+
+Large differences in abundancies were found between samples. This can be explained by several factors. Firstly, sample location. Low quantities were all found in outer currents of the Atlantic gyres. As plastics tend to concentrate in the centre of the two respective gyres, quantities in these surrounding currents tend to be relatively low (van Sebille, 2015). Furthermore, particle abundancy is influenced by sea state, wind speed and towing speed (Eriksen et al., 2014; Kukulka, 2012; Van Sebille, 2015; Reisser, 2015). Rougher seas, more wind and high towing speed causes the net to destabilize, taking in less volume of water per unit of time. Rougher seas cause buoyant particles to move vertically through the water column, with (smaller) particles being pushed down and missed by the net. Kulkuka et al., (2012) shows that particle abundancies sampled in ocean surface waters with a wind speed higher than 5m/s, or Beaufort 3, are significantly underestimated. Although we eliminated samples taken under the roughest circumstances and with highest boat speeds, we did not take wind speed into account. Most sampling suffered from wind speed around Beaufort 8.  As such, abundancies for our samples can be underestimated. 
+
+This study addressed the classification between micro and macroplastics. In many studies, the majority of the particles sampled is smaller than 5mm and a minority is larger than 5mm (Morét-Ferguson et al., 2010; Gewert et al., 2017). The consequential large presence of microplastics in terms of number concentrations, showing the possibility of being ingested by a variety of marine life, has spurred academic and public attention for the issue. This results in much research currently being focused on micro-plastics solely. Attention for macro-plastic, on the other hand, is concentrated on very large plastics like fishing nets or plastic bags, which are known to lead to entanglement (Mendenhall, 2018; Rochman, et al., 2016; Wilcox et al., 2016). Available data for plastics in the Atlantic however, show, just like our study, that most plastic particles >5mm are not large macroplastics, but consists of small plastics, sometimes referred to as ‘mesoplastics’. The current focus on categorization of size in micro versus macroplastics, seems to overlook these mesoplastics. The term macroplastics might be a too uniform  categorization, thus slightly deceptive, whereas microplastic might be a too narrow categorization. 
+
+Shape categories and polymer types found correspond with findings of other studies. Shape category consisting primarily of fragments, followed in random order by film, line, pellet and foam and polymer type categories consisting mostly of PE, followed by PP (Morét-Ferguson et al., 2010; McDermid & Mullen, 2004; Gewert et al., 2017; Kukulka et al., 2012; Yokota et al., 2017; Hidalgo-Ruz eta l., 2012). These polymer types correlate with buoyant plastics and are therefore expected to be found in surface waters (ibid). This however, does not mean that plastics in marine waters consist solely of these polymers. Studies researching the plastic flow into marine waters, beach plastics or vertical distribution of plastics, indicate that a higher variety of plastic types might well be present (Kooi & Koelmans, 2019; Ivar do Sul et al., 2014). Also, when comparing our findings with other studies in the Atlantic, slightly different results for shape categories when looking past the largest category (fragments) were found. Relatively few pellets and foam were present and relatively more film and line, whereas other studies find a higher amount of pellet or foam in comparison with film and line (Moret-Ferguson, 2010). One explanation, and simultaneously a shortcoming of this research is that the far majority of analysed particles came from large samples, taken from the centre of the North Atlantic, whereas types and density of plastics can differ between locations (Mendenhall, 2018). 
+
+## Plotting real size and shape in continuous distributions 
+
+Kooi & Koelmans (2019) state that classifications will ‘never be fully satisfactory, as any definition using classes does not capture the essentially continuous nature of [environmental] microplastic’. It is therefore proposed to step away from classifications and to map (micro) plastics through continuous (density) distributions.
+
+Our created distributions provide information on the continuity of size and shape categories, as well as information on heterogeneity within and overlap between categories, far exceeding the amount of information pre-defined categorization methods provide. However, our data analysis also shows that distributions cannot be seen separately from categories. Categorization is recommendable in the early stages of data analysis. As height of particles is hard to measure, we based height on classes of predetermined categories. As such, we need categorization to allow for a CSF calculation. This results in CSFs being based on pre-determined categories. 
+
+Furthermore, in later stages of analysis, categories can be useful in making distributions tangible. For CSF, considering the heterogeneity between certain shape categories (very different shape, but within their category often similar), and their resulting ‘unique’ CSF classes (for film, flakes, fragments and line),  they can aid in visualizing/understanding CSF distributions. For length, the skew to the right of the distribution can be explained by the influence of particles classified as macroplastics and of classified a certain shape (line & flake). 
+
+However, our distributions also show that categorization classes can be improved and that categorization should occur on the basis of classes found within the data, after which these classes can be linked to existing categories. From this it stems that categorization should only function after, and not prior to plotting continuous distributions. Shape category 'fragment‘ turned out to be present in two distinct shape classes: shape class ‘fragment’ and shape class ‘line/flake’. This means that there is a large variety in shape that is homogenised by using a single pre-determined shape category ‘fragment’. Size category ‘microplastics’ misrepresents the presence of some shapes, respectively CSF values around 0.2 - line and flake - , which might be problematic in choosing relevant marine plastics for risk assessment.  This is considered an important point, amplifying the mentioned concern of Kooi & Koelmans regarding categorization. Indeed, line and flakes, with a length larger than 5mm but not exceeding 123mm – correlating to the previously  mentioned ‘in between category’ of mesoplastics - are currently almost invisible in any risk analysis on microplastics or macroplastics (Mendenhall, 2018; Thiel et al., 2018; Galloway et al., 2017; Everaert, 2018). However, particles like with a diameter, width or height <5mm, can very well be eaten by many of the organisms facing the risk of eating plastics with a length <5mm. It can even be boldly suggested that these particles are more dangerous in the marine environment than smaller particles. Especially those with a small diameter or a small width which enables an organism to swallow the particle but might decrease its chances of digestion and defecation. Considering the previous mentioned point that the category of microplastics might be too narrow, whereas macroplastics might be too uniform, it is suggested that these rather subjective and random limits should be reconsidered. The importance of reconsidering categories is noted in recent work of Hartmann et al., (2019), who propose a more detailed categorization scheme for analysing marine plastics, differing for size between nanoplastics (1<1000nm), microplastics (1<1000micron), mesoplastics (1<10mm) and macroplastics (>1cm) and dividing shape in spheres, irregular shapes, fibers and films. Still,, because these are determined a priori, valuable data can be missed. Seeing the superiority of using distributions for the sake of representing heterogeneity and continuity of marine plastics, it is recommended not to use size categories micro/macro/nano/mesoplastic, but instead to first plot distributions for all plastics and then choose a relevant size limit. 
+
+Our final distributions are plotted avoiding any pre-determined classification, however they show the interdependency of the distributions with categories existing within the data well. It is recommended that tailor made distributions should be made on the base of classes found within the data. Defining classes is needed; without doing this, the distributions are highly interrelated and further analysis might be unreliable. Final distributions are created for each of the three CSF classes. It can however also be argued that two distributions can be sufficient, namely one for CSF class 1 & 3 (fragments and film) and one for CSF class 2. Furthermore, the large influence of ‘line’ in CSF class 2 ‘line/flake’ problematizes further analysis of this distribution. Perhaps it is not necessary to produce different distributions per CSF class. Instead, it might be possible to only isolate ‘line’ and hereby allowing for correlation tests and parameter fitting. Hence, it follows that most suitable distributions should be researched more extensively, and that as such distributions created here function only as a starting point for further research. 
+
+## Correlations
+
+For risk modelling, it is important to know whether there is correlation between used variables. Kooi & Koelmans (2019) assume the absence of correlation between the length, CSF and density. This study states a slight correlation between length and shape, with polymer type showing no correlation. However, density was not measured in continuous distributions, as the exact density of particles was unknown. Also, the potential variability in density caused by biofouling is ignored in our analysis (Kooi et al., 2017). Therefore, the result of no correlation between polymer type and length and polymer type and CSF can be contested. It is argued that the assumption of no relationship between length, CSF and density should be further studied. 
+
+Finally, some more limitations were apparent which might influence our distributions and resulting correlation. Sieving particles can cause brittle materials like film to break. It leads to a possible overestimation of the amount of small film or fragment, or an underestimating of the total amount of brittle particles when particles break in pieces smaller than 0.5mm (which are excluded from the analysis). Excluding particles smaller than 1mm limits the generalizability of our results. The logic applied to not limiting data analysis to the use of pre-determined categories can be applied to the lower end of our data collection. The 1mm limit was purely based on practical limitations. Particles smaller than 1mm have been shown to have an ubiquitous presence and a possibly higher risk effect (Everaert, 2018), thus data collection and analysis for risk assessment should include plastics from all sizes, either in sampling practice, or in later risk assessment analysis. This precedes the necessity of capturing these small sized particles also in continuous distributions. Finally, the assumptions used for height for particles <5mm might underestimate the amount of flakes for micro plastics. 3D measurement tools are up and coming, and should where possible be used to ease and optimize the measuring process. Furthermore, the use of Ferret’s diameter for approaching length and width, has its limitations. Ferret’s diameter approaches the two longest dimension and the two shortest dimensions of a particle, however works best when particles have a stable position. As positions of particles were not always the same, size could have been slightly under – or overestimated (Mercus, 2009). For future research, best size approximation tools for plastics should be critically assessed and standardized methods for measuring plastics should be developed. 
+
+# Conclusion
+
+The aim of this research was to find the best way to map abundancies of plastics found in marine surface waters of the Atlantic, while providing detailed information on the heterogeneous, continuous, and (possibly) interrelated nature of particle size, shape and density. Current methods of pre-determined categorization are found inadequate for assessing risk of plastic debris to marine life. Here, categorization was compared with a novel method by Kooi & Koelmans (2019) of mapping size, shape and density through continuous distributions, which would provide necessary information. 
+
+We found that continuous distributions provide thorough information on continuity and heterogeneity of marine plastics and is much preferable to using pre-distinct categorization, which eliminates valuable data. However, distributions for shape and size were found to be intrinsically related to interrelated classes within the data. These classes correlate partly with pre-determined categorization. Strong interrelationships between classes complicate further analysis. Distributions should therefore not ignore categorization. Instead, posteriori categorization by looking at latent classes within the data which can be described by existing shape and size categories or can be extended by newly found categories, can function to 1) make distributions tangible and 2) provide a basis for creating workable distributions, which are not dependent on an interrelationship between groups. It is thus recommended not to ‘step away’ from in finding the best way to map marine plastics for risk assessment purposes, but to combine data on categorization posteriori to creating distributions.
+
+This finding is especially important considering the current public and academic focus on the pre-determined category microplastics. The term microplastics puts a rather subjective, random, and notoriously exclusive limit on particles with a length larger than 5mm. Our analysis shows that particles with a possible equal harmful effect on marine organisms as ‘microplastics’, are overlooked. Hence, especially for size, it is important to create distributions prior to categorization. From this it follows that it is of utter importance that the term microplastics should be re-assessed.
+Finally, our research indicated the need for further research. The possibility of a relationship between the shape, size and density should be further studied. We found a slight relationship, more so for shape and size than for density, however results were ambiguous. Furthermore, the method of describing marine plastic through continuous distributions is novel. This research is first in testing the method for data on marine plastics. Therefore, distributions should by no means be generalized. Instead, more research is needed to decide on generalizable distributions. 
+
+\newpage
+
+# References
+```{r create_r-references}
+r_refs(file = "r-references.bib")
+```
+
+\begingroup
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
+Dr. Timur Seidel e.K. sIRo – stationary Infra-Red optic for Identifying Plastics. Retrieved from http://www.iosys-seidel.de/en/siro.html
+
+Environ. Sci. Technol., 51 (2017), pp. 7963-7971
+
+Eriksen, M., L.C. Lebreton, H.S. Carson, M. Thiel, C.J. Moore, J.C. Borerro, F. Galgani, P.G. Ryan, J. Reisser (2014). Plastic Pollution in the World’s Oceans: More than 5 Trillion Plastic Pieces Weighing over 250,000 Tons Afloat at Sea. PLoS One, 9(12), DOI: 10.1371/journal.pone.0111913
+
+European Commission (2016). International ocean governance: an agenda for the future of oceans. JOIN (2016)., p. 17
+
+Everaert, G., L. van Cauwenberghe, M. de Rijcke, A. A. Koelmans, J. Mees, M. Vandegehuchte, C.R. Janssen (2018). Risk assessment of microplastics in the ocean: Modelling approach and first conclusions. Environmental Pollution, 242, 1930 – 1938
+
+Galloway, S.T., M. Cole, C. Lewis (2017). Interactions of microplastic debris throughout the marine ecosystem. Nature ecology & evolution, 1, Article number: 0116 (2017)
+
+Gewert, B., M. Ogonowski, A. Barth, M. Macleod (2017). Abundance and composition of near surface microplastics and plastic debris in the Stockholm Archipelago, Baltic Sea. Marine Pollution Bulletin, 120(1-2), 292-302. 
+
+Geyer, R., Jambeck, J. R., & Law, K. L. (2017). Production, use, and fate of all plastics ever made. Science Advances, 3(7), e1700782. Available at: http://advances.sciencemag.org/content/3/7/e1700782.
+
+Hartmann, B., T. Hueffer, R.C. Thompson, M. Hasselloev, A. Verschoor, A.E. Daugaard, S. Rist, T. Karlsson, N. Brennholt, M. Cole, M.P. Herrling, M.C. Hess, N.P. Ivleva, A. L. Lusher, M. Wagner (2019). Are We Speaking the Same Language? Recommendations for a Definition and Categorization Framework for Plastic Debris. Environ. Sci. Technol, 53(3), 1039-1047.
+
+Haward, M. (2018). Plastic pollution of the world’s seas and oceans as a contemporary challenge in ocean governance. Nature Communications, 9, Article number: 667
+
+Hidalgo-Ruz, V., L. Gutow, R.C. Thompshon, M. Thiel (2012). Microplastics in the Marine Environment: A Review of the Methods Used for Identification and Quantification. Environ. Sci. Technol., 46(6), 3060-3075
+
+Infrared (FT-IR) Imaging. Water Res. 2018, 142, 1.
+
+Ivar do Sul, J., M.F. Costa, G. Fillmann (2014). Microplastics in the pelagic environment around oceanic islands of the Western Tropical Atlantic Ocean. Water, Air, & Soil Pullution, 225. 
+
+Jahnke, A., H.P. Arp, B.I. Escher, B. Gewert, E. Gorokhova, D. Kuehnel, M. Ogonowski, A. Potthoff, C. Rummel, M. Schmitt-Jansen, E. Toorman, M. Macleod (2017). Reducing Uncertainty and Confronting Ignorance about the Possible Impacts of Weathering Plastic in the Marine Environment. Environmental Science & Technology Letters, 4(3), 85-90.
+
+Jambeck, J. R., Geyer, R., Wilcox, C., Siegler, T. R., Perryman, M., Andrady, A., … & Law, K. L. (2015). Plastic waste inputs from land into the ocean. Science, 347(6223), 768-771. Available at: http://science.sciencemag.org/content/347/6223/768.
+
+Kabacoff, R. (2018). Data visualization with R. Westleyan University: Qualitative Analysis Center, pp. 56. Retrieved from: https://rkabacoff.github.io/datavis/datavis.pdf
+
+Kathryn, W., C. maureaud, C. Wilcox, B.D. Hardesty (2018). How successful are waste abatement campaigns and government policies at reducing plastic waste into the marine environment? Marine Policy, 96, 243-249
+
+Koelmans, A., E. Besseling, E. Foekema, M. Kooi, S. Mintenig, B.C. Ossendorp, P.E.Redondo-Hasselerharm, A. Verschoor, A.P. van Wezel, M. Scheffer (2017). Risks of Plastic Debris: Unravelling Fact, Opinion, Perception and Belief. Environmental Science and Technology, 51, 11513-11519.
+
+Kooi, M. & A. A. Koelmans (2019). Simplifying microplastics … 
+
+Kukulka, T., G. Proskurowski, S. Morét-Furguson, D.W. Meyer, K.L. Law (2012). The effect of wind mixing on the vertical distribution of buoyant plastic debri. Geophysical Research Letters, 39(7). 
+
+Law, K.L. (2016). Plastics in the Marine Environment. Annu. Rev. Mar. Sci., 9, 205-209. 
+
+Lenz, R., K. Enders, C.A. Stedmon, D.M.A. Mackenzie, T.G. Nielsen (2015). A critical assessment of visual identification of marine microplastic using Raman spectroscopy for analysis improvement. Marine Pollution Bulletin, 100(1), 82-91. 
+
+Li, W.C., H.F. Tse, L. Fok (2016). Plastic waste in the marine environment: A review of sources occurrence and effects. Science of The Total Environment, 566-567(1), 333-349.
+
+M. Kooi, E.H. Van Nes, M. Scheffer, A.A. KoelmansUps and downs in the ocean: effects of biofouling on vertical transport of microplastics
+
+McDermid, K.J., T.L. McMullen (2004). Quantitative analysis of small-plastic debris on beaches in the Hawaiian archipelago. Marine Pollution Bulletin, 48(7-8), 790-794
+
+Mendenhall, E. (2018). Oceans of plastic: A research agenda to propel policy development. Marine Policy, 96, 291-298. 
+
+Merkus, H.G. (2009). Particle Size Measurements: Fundamentals, Practice, Quality. Springer Science+Business Media B.V, pp. 15-15. 
+
+Microplastic Mass and Removal Rates at Wastewater Treatment
+
+Morét-Ferguson, S., K.L. Law, G. Proskurowski, E.K. Murphy, E.E. Peacock, C.M. Reddy (2010). ‘The size, mass and composition of plastic debris in the western North Atlantic Ocean. Marine Pollution Bulletin, 60(10): 1873-1878. 
+
+Plants Applying Focal Plane Array (FPA)-Based Fourier Transform
+
+Reisser, J.W., B. Slat, K.D. Noble, K.D. Plessis, M. Epp, M.C. Proietti, J. de Sonneville, T. Becker, C. Pattiaratchi (2015). The vertical distribution of buoyant plastics at sea: an observational study in the North Atlantic Gyre. Retrieved from: http://repositorio.furg.br/handle/1/5819
+
+Rocha-Santos, A.C. Duarte (2015). A critical overview of the analytical approaches to the occurrence, the fate and the behaviour of microplastics in the environment. trAC Trends in Analytical Chemistry, 65, 47-53
+
+Rochman, C.M., M. Anthony Browne, A.J. Underwood, J. A. van Franeker, R. C. Thompson, L. A. Amaral-Zettler (2016). The ecological impacts of marine debris: unraveling the demonstrated evidence from what is perceived.  Ecology, 97(2). 
+
+RStudio Team (2018). RStudio: Integrated Development for R. RStudio, Inc., Boston, MA URL http://www.rstudio.com/.
+
+SAPEA (2019). A scientific perspective on micro-plastics in Nature and Society. Evidence Review Report: Berlin, 2019(report No 4). Retrieved from https://www.sapea.info/wp-content/uploads/report.pdf
+
+Schneider, C. A.; Rasband, W. S. & Eliceiri, K. W. (2012), "NIH Image to ImageJ: 25 years of image analysis", Nature methods 9(7): 671-675, PMID 22930834 
+
+Schott, F.A., C. W. Boening (1991). The WOCE Model in the Western Equatorial Atlantic: Upper Layer Circulation. Journal of Geophysical Research, 96(C4): 6993-7004
+
+Sharma, S. & S. Chatterjee (2017). Microplastic pollution, a threat to marine ecosystem and human health: a short review. Environmental Science and Pollution Research, 24 (27),  21530 – 21547.
+
+Simon et al., 
+
+Simon, M, N. van Alst, J. Vollertsen (2018). Quantification of microplastic mass and removal rates at wastewater treatment plats applying Focal Plane Array (FPA) based Fourier Transform Infrared (FT-IR) imaging.  Water Research, 142(1), 1-9
+
+Simon, M.; van Alst, N.; Vollertsen, J. Quantification of
+
+Suaria, G., C.G. Avio, A. Mineo, G. L. Lattin, M.G. Magaldi, Gl. Belmonte, C. J. Moore, F. Regolo, S. Aliani (2016). The Mediterranean Plastic Soup: synthetic polymers in Mediterranean surface waters. Scientific reports 6. DOI: 10.1018/srep37551.
+
+Sustar, V., J. Kolar, L. Lusa, T. Learner, M. Schilling, R. Revenc, H. Khanjian, D. Kolesa (2014). Identification of historical polymers using Near-Infrared Spectroscopy. Polymer Degradation and Stability, 107, 314-347
+
+Sympatec GmbH (2017-2019). Particle Shape Analysis. Particle shape and shape descriptors. Retrieved from: https://www.sympatec.com/en/particle-measurement/glossary/particle-shape/. 
+
+Thermo Scientific. White Paper: Technology Comparison: FTIR, NIR, and Raman for Raw Material Inspection. 
+
+Thermo Scientific™. OMNIC™ Specta Software. Retrieved from: https://www.thermofisher.com/order/catalog/product/833-036200#/833-036200
+
+Thiel, M., G. Luna-Jorquera, R. Alvarez-Varas, C. Gallardo, I. A. Hinojosa, N. Luna, D. Miranda-Urbina, N. Morales, N. Ory, A.S. Pacheco, M. Portflitt-Toro, C. Zavalaga (2018). Impacts of Marine Plastic Pollution from Continental Coasts to Subtropical Gyres – Fish, Seabirds, and Other Vertebrates in the SE Pacific. Front. Mar. Sci. DOI: 10.3389/fmars.2018.00238
+
+UNEP (2018). SINGLE-USE PLASTICS: a Roadmap for Sustainability. ISBN: 978-92-807-3705-9
+
+Van Sebille, E., C. Wilcox, L. Lebreton, N. Maximenko, B.D. Hardesty, J.A. van Franeker, M. Eriksen, D. Siegel, F. Galgani, K.L. Law (2015). A global inventory of small floating plastic debris. Environ. Res. Lett, 10(12), 124006
+
+Villarubia-Gomez, P., S. E. cornell, J. Fabres (2018). Marine plastic pollution as a planetary boundary threat – The drifting piece in the sustainability puzzle. Marine Policy, 96, 213-220. 
+
+Vince. J & B.D. Hardesy (2017). Plastic pollution challenges in marine and coastal environments. From local to global governance. Restor. Ecol., 25(2017), pp. 123-128
+
+Yokota, K., H. Waterfield, C. Hastings, E. Davidson, E. Kwietniewski, B. Wells (2017). Finding the missing piece of the aquatic plastic pollution puzzle: Interaction between primary producers and microplastics. 
+
+Zanthos, D. & T.R. Walker (2017). International policies to reduce plastic marine pollution from single-use plastics (plastic bags and microbeads): A review. Marine Pollution Bulletin, 118(1-2), 17-26
+<div id = "refs"></div>
+\endgroup

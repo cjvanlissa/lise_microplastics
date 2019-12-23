@@ -1,10 +1,34 @@
 analyzedat <- df[, c("length", "width", "Film", "Line")]
-tmp <- estimate_profiles(analyzedat[, c(1, 2)], 1, variances = "varying", covariances = "varying", package = "MplusAutomation", keepfiles = TRUE)
+
+# First, analyze separately for film, line, and others, to determine number
+# of components
 
 
+
+
+
+plot_profiles(res_other[[1]])
+
+class(res_other[[1]]$dff)
 
 tidyLPA:::estimate_profiles_mplus2()
 
+# Analyze lines ------------------------------------------------------------
+
+analyze_line <- analyzedat[analyzedat$Line == 1, c("length")]
+
+if(!file.exists("res_line.RData")){
+  res_line <- estimate_profiles(analyze_line, 1:5, variances = c("varying"), covariances = c("zero"), package = "MplusAutomation")
+  saveRDS(res_line, "res_line.RData")
+} else {
+  res_line <- readRDS("res_line.RData")
+}
+plot_density(res_line)
+
+# Two-class solution looks best
+
+plot_bivariate(res_line$model_4_class_1)
+res_line[[2]]$model$errors
 model <- c("[length];",
            "[width];",
            "length;",

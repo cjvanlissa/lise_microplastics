@@ -1,4 +1,4 @@
-df <- read.csv("data file Cas.csv", stringsAsFactors = FALSE, colClasses = "character")
+df <- read.csv("data.csv", stringsAsFactors = FALSE, colClasses = "character")
 df <- df[, !grepl("^CSF", names(df))]
 missingness <- rowSums(is.na(df))
 table(missingness)
@@ -84,8 +84,17 @@ sapply(unique(df$category), function(x){
 
 tmp <- df[!is.na(df$height_obs) & df$category == "Fragment", ]
 cor(tmp[, c("length", "width", "height_obs")])
+res <- lm(height_obs~length + I(length^2)+width+I(width^2), tmp)
+res <- lm(height_obs~length + width, tmp)
+summary(res)
+p <- ggplot(tmp, aes(x= width, y = height_obs))+geom_point()
+width <- seq(0, max(tmp$width), length.out = 1000)
+height_obs <- predict(res, newdata = data.frame(length = mean(tmp$length), width = width))
+p + geom_path(data = data.frame(width = width, height_obs = height_obs))
+df_pc <- df[df$category == "Fragment", c("length", "width")]
+pc <- principal(df_pc, nfactors = 2)
+plot(pc$scores[,1], pc$scores[,2])
 
-pc <- principal(cor(tmp[, c("length", "width", "height_obs")]))
 pc$values
 # And for Fragment, LxWxH carry very similar information
 
@@ -98,9 +107,13 @@ df$Line <- as.numeric(df$category == "Line")
 # Maybe do something with outliers:
 check_vars <- c("length", "width")
 mah <- mahalanobis(df[, check_vars], colMeans(df[, check_vars], na.rm = TRUE), cov(df[, check_vars]))
-plot(density(mah))
-sum(mah > 14)
+plot(density(mah[mah<50]))
+sum(mah > 12)
 df[order(mah, decreasing = TRUE)[1:10], ]
 df[order(mah, decreasing = TRUE)[11:20], ]
+table(df$category[mah>12])
+#df[mah > 12 & df$category == "Fragment", ]
 
-rm(Cat_cat, pc, PT_cat, tmp, missingness, re_categorize, mah, check_vars, h, has_h, num_decimals, illegal_values)
+#df <- df[!mah>12, ]
+write.csv(df, "df.csv", row.names = FALSE)
+rm(Cat_cat, PT_cat, tmp, missingness, re_categorize, mah, check_vars, h, has_h, num_decimals, illegal_values)

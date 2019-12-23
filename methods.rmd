@@ -1,0 +1,233 @@
+---
+title             : "Rethinking microplastics: mapping the continuous and interrelated nature of shape, size and density of marine plastics in distributions"
+shorttitle        : "Rethinking microplastics"
+
+author: 
+  - name          : "Lise Alkema"
+    affiliation   : "1"
+    corresponding : yes
+    address       : "Postal address"
+    email         : "my@email.com"
+  - name          : "Caspar J. van Lissa"
+    affiliation   : "2"
+  - name          : "Merel Kooi"
+    affiliation   : "1"
+  - name          : "A. A. Koelmans"
+    affiliation   : "1"
+
+affiliation:
+  - id            : "1"
+    institution   : "Wageningen University"
+  - id            : "2"
+    institution   : "Utrecht University, department of Methodology & Statistics"
+
+authornote: |
+  Add complete departmental affiliations for each author here. Each new line herein must be indented, like this line.
+
+  Enter author note here.
+
+abstract: |
+  Methods
+  
+keywords          : "microplastics, plastic, maritime, mixture model"
+wordcount         : "X"
+
+bibliography      : ["r-references.bib"]
+
+floatsintext      : no
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+linenumbers       : yes
+mask              : no
+draft             : no
+
+documentclass     : "apa6"
+classoption       : "man"
+output            : papaja::apa6_pdf
+---
+
+```{r setup, include = FALSE}
+run_everything = FALSE
+library("papaja")
+source("setup.r")
+if(run_everything){
+  source("clean_data.r")
+} else {
+  df <- read.csv("df.csv", stringsAsFactors = FALSE)
+}
+
+```
+
+```{r analysis-preferences}
+# Seed for random number generation
+set.seed(42)
+knitr::opts_chunk$set(cache.extra = knitr::rand_seed,
+                      echo = FALSE,
+                      warning = FALSE,
+                      message = FALSE)
+```
+
+# Methods
+
+With regard to the dimensionality of particles, we can distinguish three cases:
+
+1. A *line* is defined as a particle that varies substantially along one dimension, and negligibly along the other two dimensions. We have measured the length and width of a bounding box containing the line. We do not know whether or not the line is coiled within this box. We can state that each line is at least as long as the diagonal of the bounding box that contains it. This uncertainty incurs additional measurement error. We include a dichotomous indicator variable to distinguish lines from other particles. **NOTE: The current data file does not contain true value of width for lines!**
+```{r}
+# Do this with raw data; current file has imputed value for width
+#df$length[df$Line == 1] <- sqrt(df$length[df$Line == 1]^2 + df$width[df$Line == 1]^2)
+```
+2. A *film* is defined as a particle that varies substantially along two dimensions, and negligibly along the third. We have measured the length and width of these particles, which describes them accurately. We include a dichotomous indicator variable to distinguish films from other particles.
+3. All other particles vary substantially along three dimensions, of which we have measured two. Assuming that three-dimensional particles are randomly oriented on the plane, we can assume that the correlation between the first two dimensions is similar in size to the correlation between each dimension and the third.
+
+<!--Because the dimensionality of particles was assessed based on bounding boxes in two-dimensional photographs, we have to take some limitations into account. We do, however, have some information about height, -->
+
+## Strategy of analyses
+
+To account for the differences in particle dimensionality, we used a stepwise plan of analysis:
+
+1. Analyze the three dimensionality categories separately, using only the dimensions relevant for that particle.
+2. Determine the best model and number of classes for each dimensionality category
+3. Create a joint model, with number of classes and starting values based on step 2. Use starting values for the dichotomous indicator variables to ensure lines and films are assigned to the correct classes.
+
+### Lines
+
+Because lines only vary across one dimension, we conducted univariate mixture models for 1-5 classes with varying means and variances.
+```{r, results='hide', include=FALSE}
+analyzedat <- df[, c("length", "width", "Film", "Line")]
+
+# Analyze lines ------------------------------------------------------------
+analyze_line <- analyzedat[analyzedat$Line == 1, c("length")]
+
+if(!file.exists("res_line.RData")){
+  res_line <- estimate_profiles(analyze_line, 1:5, variances = c("varying"), covariances = c("zero"), package = "MplusAutomation", OUTPUT = "svalues;", keepfiles = TRUE)
+  saveRDS(res_line, "res_line.RData")
+} else {
+  res_line <- readRDS("res_line.RData")
+}
+comp_line <- compare_solutions(res_line)
+plot_bic(comp_line)
+p <- plot_density(res_line, facet_labels = c("model 2 class 1" = "1 class",
+                                        "model 2 class 2" = "2 class",
+                                        "model 2 class 3" = "3 class",
+                                        "model 2 class 4" = "4 class",
+                                        "model 2 class 5" = "5 class"))+ theme(legend.position = "none")
+```
+```{r tabclasslines1, results = "asis"}
+tab_class(comp_line)
+```
+
+As indicated in Table \@ref(tab:tabclasslines1), BIC indicated that the 3-class model fitted best. However, the difference in BIC with the 2-class model was trivial, and the entropy of a 2-class solution was much higher. Most importantly, visual inspection of the solution (Figure \@ref(fig:figclasslines1)) clearly revealed a bimodal distribution. We thus chose a 2-class solution.
+
+```{r figclasslines1, out.width="100%", fig.cap="Mixture model of lines"}
+p
+```
+
+### Film
+
+For film, we conducted bivariate mixture models for 1-5 classes. We compared models with varying means and variances, to models that also included varying covariances.
+```{r, results = "hide"}
+# Analyze film ------------------------------------------------------------
+analyze_film <- analyzedat[analyzedat$Film == 1, c("length", "width")]
+
+if(!file.exists("res_film.RData")){
+  res_film <- estimate_profiles(analyze_film, 1:5, variances = c("varying", "varying"), covariances = c("equal", "varying"), package = "MplusAutomation")
+  saveRDS(res_film, "res_film.RData")
+} else {
+  res_film <- readRDS("res_film.RData")
+}
+comp_film <- compare_solutions(res_film)
+res_film
+
+# Use plot to interpret BIC change
+plot_bic(comp_film)
+
+# Maybe use Skew-T distribution instead of two classes?
+```
+```{r tabclassfilm2, results = "asis"}
+tab_class(comp_film)
+```
+
+As indicated in Table \@ref(tab:tabclassfilm2), BIC values hardly differed between the models with fixed, and free covariances. We thus prefer the simpler models with fixed covariances. Furthermore, BIC showed a substantial drop from the 1- to 2-class solution, followed by a smaller drop to the 3-class solution, after which the decrease stabilized. Entropy was higher for the 2-class than for the 3-class solution, indicating that the two classes were more clearly separable. Visual inspection of the solutions (Figures \@ref(fig:figclassfilm2) and \@ref(fig:figclassfilm3)) were inconclusive. Per Occam's razor, we thus retained the simpler 2-class solution.
+
+```{r figclassfilm2, out.width="100%", fig.cap="Mixture model of film with free means and variances, and fixed covariances"}
+plot_bivariate(res_film$model_4_class_2)
+```
+
+```{r figclassfilm3, out.width="100%", fig.cap="Mixture model of film with free means and variances, and fixed covariances"}
+plot_bivariate(res_film$model_4_class_3)
+```
+
+### Other
+
+For the remaining particles, we conducted the same bivariate mixture models as for film.
+```{r, results = "hide"}
+analyze_other <- analyzedat[!(analyzedat$Film == 1|analyzedat$Line == 1), c("length", "width")]
+
+if(!file.exists("res_other.RData")){
+  res_other <- estimate_profiles(analyze_other, 1:5, variances = c("varying", "varying"), covariances = c("equal", "varying"), package = "MplusAutomation")
+  #res_other_skewt <- estimate_profiles(analyze_other, 1:2, variances = "varying", covariances = "equal", package = "MplusAutomation", keepfiles = TRUE, ANALYSIS = "DISTRIBUTION = skewt;\n")
+  saveRDS(res_other, "res_other.RData")
+} else {
+  res_other <- readRDS("res_other.RData")
+}
+res_other
+
+comp_other <- compare_solutions(res_other)
+
+plot_bic(comp_other)
+#plot_bivariate(res_other$model_4_class_3)
+
+
+# Fixed covariances, two class solution
+
+#plot_profiles(res_other[[1]])
+#class(res_other[[1]]$dff)
+
+# Maybe use Skew-t distribution instead of two classes?
+# skewt <- readModels(filefilter = "skewt")
+#saveRDS(skewt, "c:/git_repositories/tidyLPA/tmp.RData")
+# skewt <- tidyLPA:::as.tidyLPA(skewt)
+# res_skewt <- res_other
+# res_skewt[names(skewt)] <- skewt
+# Df < 3 means the skewness parameter is not defined. Using data with outliers, the df are even <2, which means that the variance parameter is not defined either. Don't use skewt
+df_plot <- res_other$model_4_class_2$dff
+df_plot$Class <- factor(df_plot$Class)
+ggplot(df_plot, aes(x = length, colour = Class, fill = Class))+geom_histogram(bins = 200)
+ggplot(df_plot, aes(x=length, color=Class)) +
+  geom_histogram(fill="white", alpha=0.5, position="identity")
+# No: Skew-t distribution is not well suited for floor effects. However, the model doesn't truly have a floor, because there is variability around the threshold (caused by the sieving)
+# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2921717/
+# http://www.statmodel.com/discussion/messages/11/18722.html?1536050708
+  
+```
+```{r tabclassother3, results = "asis"}
+tab_class(comp_other)
+```
+
+Similar to the models for film, BIC values hardly differed between the models with fixed, and free covariances, Table \@ref(tab:tabclassother3). We thus prefer the simpler models with fixed covariances. Furthermore, BIC showed a substantial drop from the 1- to 2-class solution, followed by a smaller drop to the 3-class solution, after which the decrease stabilized. Entropy was higher for the 2-class than for the 3-class solution, indicating that the two classes were more clearly separable. Visual inspection of the solutions (Figures \@ref(fig:figclassother4) and \@ref(fig:figclassother5)) were inconclusive. Per Occam's razor, we thus retained the simpler 2-class solution. 
+
+It appears that the distribution of other particles might be captured more accurately by a strongly skewed density function, such as the skewed t-distribution. Although the BIC for a 1-class solution with a skewed t-distribution was slightly lower than for a 2-class solution with normal distributions, the estimate for *df* was low, and the estimate for skewness was infinite, making this solution impractical for modeling purposes. Future work should explore the optimal density function to describe this distribution.
+
+```{r figclassother4, out.width="100%", fig.cap="Mixture model of other particles with free means and variances, and fixed covariances"}
+plot_bivariate(res_other$model_4_class_2)
+```
+
+```{r figclassother5, out.width="100%", fig.cap="Mixture model of other particles with free means and variances, and fixed covariances"}
+plot_bivariate(res_other$model_4_class_3)
+```
+
+<!-- Robust SE of multilevel voor de verschillende samples? -->
+\newpage
+
+# References
+```{r create_r-references}
+r_refs(file = "r-references.bib")
+```
+
+\begingroup
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
+
+<div id = "refs"></div>
+\endgroup

@@ -49,8 +49,6 @@ output            : papaja::apa6_pdf
 
 ```{r setup, include = FALSE}
 library("papaja")
-source("setup.r")
-source("clean_data.r")
 ```
 
 ```{r analysis-preferences}

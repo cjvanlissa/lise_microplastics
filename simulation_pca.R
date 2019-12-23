@@ -1,9 +1,25 @@
+install.packages("psych")
+install.packages("doParallel")
+install.packages("tidyLPA")
 library(psych)
-seed <- 57432
-n = 200
-K = 100
+library(doParallel)
+library(parallel)
 
-sim_results <- replicate(K, {
+n = 200
+K = 3*45
+
+create_clusters <- function(no_cores = 45){
+  cl <- makeCluster(no_cores)
+  clusterEvalQ(cl, library(psych))
+  clusterEvalQ(cl, library(tidyLPA))
+  registerDoParallel(cl)
+  cl
+}
+cl <- create_clusters()
+
+seed <- 6883
+
+sim_results <- foreach(it = 1:K, .combine = rbind)  %dopar% {
   true_class <- factor(sample(c("fragment", "flake"), n, replace = TRUE))
   
   h <- rnorm(n)
@@ -14,17 +30,28 @@ sim_results <- replicate(K, {
   res <- estimate_profiles(cbind(h, w), 1:4, variances = "varying", covariances = "varying")
   tmp <- compare_solutions(res)
   tab <- table(res$model_6_class_2$dff$Class, true_class)
-  out <- c(tmp$fits$LogLik, tmp$fits$BIC, tmp$fits$Entropy, sum(apply(tab, 1, max)/n))
+  if(!is.na(tmp$fits$LogLik)){
+    out <- c(tmp$fits$LogLik, tmp$fits$BIC, tmp$fits$Entropy, sum(apply(tab, 1, max)/n))
+  } else {
+    out <- rep(NA, 13)
+  }
   
   pcdat <- principal(cbind(h, w), nfactors = 2)$scores
   
   res <- estimate_profiles(pcdat, 1:4, variances = "varying", covariances = "varying")
   tmp <- compare_solutions(res)
   tab <- table(res$model_6_class_2$dff$Class, true_class)
+  if(!is.na(tmp$fits$LogLik)){
+    c(out, tmp$fits$LogLik, tmp$fits$BIC, tmp$fits$Entropy, sum(apply(tab, 1, max)/n))
+  } else {
+    out <- c(out, rep(NA, 13))
+  }
   
-  c(out, tmp$fits$LogLik, tmp$fits$BIC, tmp$fits$Entropy, sum(apply(tab, 1, max)/n))
-})
-sim_results <- data.frame(t(sim_results))
+}
+
+#saveRDS(sim_results, "sim_results.RData")
+sim_results <- readRDS("sim_results.RData")
+sim_results <- data.frame(sim_results)
 names(sim_results) <- c(paste0("LL", 1:4), paste0("BIC", 1:4), paste0("Ent", 1:4), "correct", 
                         paste0("LLpc", 1:4), paste0("BICpc", 1:4), paste0("Entpc", 1:4), "correctpc")
 
@@ -34,6 +61,7 @@ sum(apply(sim_results[, grep("^BICpc\\d", names(sim_results))], 1, which.min) ==
 
 # Entropy higher for PC
 sum(sim_results$Entpc2 > sim_results$Ent2)
+sum(sim_results$Ent2 > sim_results$Entpc2)
 
 # More correct
 sum(sim_results$correctpc > sim_results$correct)-sum(sim_results$correctpc < sim_results$correct)

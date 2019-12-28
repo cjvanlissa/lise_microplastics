@@ -10,3 +10,8 @@
 *.dat
 *.inp
 *.out
+*.fff
+*.ttt
+*.dgm
+manuscript_files/
+methods_files/

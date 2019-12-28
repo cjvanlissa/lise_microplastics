@@ -71,7 +71,21 @@ Cat_cat <- list(
 df$category <- re_categorize(df$cat, Cat_cat)
 table(df$cat, df$category)
 
-names(df)[match(c("S", "L..mm.", "W..mm.", "H..mm.", "H..5mm."), names(df))] <- c("sample", "length", "width", "height_est", "height_obs")
+names(df)[match(c("S", "L..mm.", "W..mm.", "A..mm.", "H..mm.", "H..5mm."), names(df))] <- c("sample", "length", "width", "area", "height_est", "height_obs")
+
+# For lines, calculate length from area divided by average diameter of a sample of lines,
+# to account for potential curvature of lines inside bounding box
+calculated_lengths <- df$area[df$category == "Line"]/0.42
+calculated_lengths[is.na(calculated_lengths)] <- df$length[df$category == "Line"][which(is.na(calculated_lengths))]
+df$length[df$category == "Line"] <- calculated_lengths
+# df$length2 <- NA
+# df$length2[df$category == "Line"] <- df$area[df$category == "Line"]/0.42
+# 
+# tmp <- df[df$category == "Line", c("length", "length2")]
+# names(tmp) <- paste0("Variable.",names(tmp))
+# tmp <- reshape(tmp, direction = "long", varying = names(tmp))
+# ggplot(tmp, aes(x = Variable, colour = time, fill = time)) + geom_density(alpha = .2)
+#cor(tmp$length, tmp$length_line, use = "pairwise.complete.obs")
 
 df <- df[, c("current", "sample", "length", "width", "height_est", "height_obs", "category", "poly_type")]
 
@@ -106,14 +120,30 @@ df$Line <- as.numeric(df$category == "Line")
 
 # Maybe do something with outliers:
 check_vars <- c("length", "width")
-mah <- mahalanobis(df[, check_vars], colMeans(df[, check_vars], na.rm = TRUE), cov(df[, check_vars]))
-plot(density(mah[mah<50]))
-sum(mah > 12)
-df[order(mah, decreasing = TRUE)[1:10], ]
-df[order(mah, decreasing = TRUE)[11:20], ]
-table(df$category[mah>12])
-#df[mah > 12 & df$category == "Fragment", ]
 
+outliers <- lapply(list(
+  "Film",
+  "Line",
+  c("Foam", "Fragment", "Pellet")
+), function(cat){
+  #cat <- "Line"
+  select_cases <- which(df$category %in% cat)
+  if(cat[1] == "Line"){
+    outl <- scale(df[select_cases, "length"])
+    select_cases[abs(as.vector(outl))>3]
+  } else {
+    mah <- mahalanobis(df[select_cases, check_vars], colMeans(df[select_cases, check_vars], na.rm = TRUE), cov(df[select_cases, check_vars]))
+    select_cases[mah > 13.82]
+  }
+  })
+# mah <- mahalanobis(df[, check_vars], colMeans(df[, check_vars], na.rm = TRUE), cov(df[, check_vars]))
+# plot(density(mah[mah<50]))
+# sum(mah > 12)
+# df[order(mah, decreasing = TRUE)[1:10], ]
+# df[order(mah, decreasing = TRUE)[11:20], ]
+# table(df$category[mah>12])
+#df[mah > 12 & df$category == "Fragment", ]
+df <- df[-unlist(outliers), ]
 #df <- df[!mah>12, ]
 write.csv(df, "df.csv", row.names = FALSE)
 rm(Cat_cat, PT_cat, tmp, missingness, re_categorize, mah, check_vars, h, has_h, num_decimals, illegal_values)

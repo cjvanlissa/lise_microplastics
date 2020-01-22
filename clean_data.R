@@ -1,11 +1,12 @@
+current_env <- ls()
 df <- read.csv("data.csv", stringsAsFactors = FALSE, colClasses = "character")
 df <- df[, !grepl("^CSF", names(df))]
 missingness <- rowSums(is.na(df))
-table(missingness)
+#table(missingness)
 df <- df[missingness < 14, ]
 
 missingness <- colSums(is.na(df))
-table(missingness)
+#table(missingness)
 
 df <- df[, !missingness > 5790]
 
@@ -18,19 +19,19 @@ illegal_values <- function(x){
 df[c("S", "N", "L..mm.", "W..mm.")] <- lapply(df[c("S", "N", "L..mm.", "W..mm.")], as.numeric)
 
 # Reorder L and W
-all(df$L..mm. >= df$W..mm.)
+#all(df$L..mm. >= df$W..mm.)
 df[,c("L..mm.", "W..mm.")] <- t(apply(df[,c("L..mm.", "W..mm.")], 1, function(x){c(max(x), min(x))}))
-all(df$L..mm. >= df$W..mm.)
+#all(df$L..mm. >= df$W..mm.)
 
-illegal_values(df$A..mm.)
+#illegal_values(df$A..mm.)
 df$A..mm.[df$A..mm. %in% c("#VALUE!", "na")] <- NA
 df$A..mm. <- as.numeric(df$A..mm.)
 
-illegal_values(df$H..mm.)
+#illegal_values(df$H..mm.)
 df$H..mm.[df$H..mm. %in% c("na", "foutje")] <- NA
 df$H..mm. <- as.numeric(df$H..mm.)
 
-illegal_values(df$D)
+#illegal_values(df$D)
 df$D[df$D %in% c("na")] <- NA
 df$D <- as.numeric(df$D)
 
@@ -58,7 +59,7 @@ PT_cat <- list(
   PE = grep("^*?PE\\s{0,}$", levels(df$PT), value = TRUE)
 )
 df$poly_type <- re_categorize(df$PT, PT_cat)
-table(df$PT, df$poly_type)
+#table(df$PT, df$poly_type)
 
 df$cat <- factor(df$category)
 Cat_cat <- list(
@@ -69,7 +70,7 @@ Cat_cat <- list(
   Pellet = grep("pellet", levels(df$cat), value = TRUE)
 )
 df$category <- re_categorize(df$cat, Cat_cat)
-table(df$cat, df$category)
+#table(df$cat, df$category)
 
 names(df)[match(c("S", "L..mm.", "W..mm.", "A..mm.", "H..mm.", "H..5mm."), names(df))] <- c("sample", "length", "width", "area", "height_est", "height_obs")
 
@@ -90,35 +91,35 @@ df$length[df$category == "Line"] <- calculated_lengths
 df <- df[, c("current", "sample", "length", "width", "height_est", "height_obs", "category", "poly_type")]
 
 # Imputed height correlates poorly with actual height, even for the fragments
-sapply(unique(df$category), function(x){
-  #x <- "Fragment"
-  tmp <- df[df$category == x, c("height_est", "height_obs")]
-  c(x, sum(complete.cases(tmp)), cor(tmp$height_est, tmp$height_obs, use = "pairwise.complete.obs"))
-})
+# sapply(unique(df$category), function(x){
+#   #x <- "Fragment"
+#   tmp <- df[df$category == x, c("height_est", "height_obs")]
+#   c(x, sum(complete.cases(tmp)), cor(tmp$height_est, tmp$height_obs, use = "pairwise.complete.obs"))
+# })
 
 tmp <- df[!is.na(df$height_obs) & df$category == "Fragment", ]
-cor(tmp[, c("length", "width", "height_obs")])
+#cor(tmp[, c("length", "width", "height_obs")])
 res <- lm(height_obs~length + I(length^2)+width+I(width^2), tmp)
 res <- lm(height_obs~length + width, tmp)
-summary(res)
+#summary(res)
 p <- ggplot(tmp, aes(x= width, y = height_obs))+geom_point()
 width <- seq(0, max(tmp$width), length.out = 1000)
 height_obs <- predict(res, newdata = data.frame(length = mean(tmp$length), width = width))
-p + geom_path(data = data.frame(width = width, height_obs = height_obs))
+#p + geom_path(data = data.frame(width = width, height_obs = height_obs))
 df_pc <- df[df$category == "Fragment", c("length", "width")]
 pc <- principal(df_pc, nfactors = 2)
-plot(pc$scores[,1], pc$scores[,2])
+#plot(pc$scores[,1], pc$scores[,2])
 
-pc$values
+#pc$values
 # And for Fragment, LxWxH carry very similar information
 
-table(df$height_est[df$category %in% c("Film", "Line")], df$category[df$category %in% c("Film", "Line")])
+#table(df$height_est[df$category %in% c("Film", "Line")], df$category[df$category %in% c("Film", "Line")])
 
 df$Two_dim <- as.numeric(df$category %in% c("Film", "Line"))
 df$Film <- as.numeric(df$category == "Film")
 df$Line <- as.numeric(df$category == "Line")
 
-# Maybe do something with outliers:
+# Remove outliers:
 check_vars <- c("length", "width")
 
 outliers <- lapply(list(
@@ -136,14 +137,9 @@ outliers <- lapply(list(
     select_cases[mah > 13.82]
   }
   })
-# mah <- mahalanobis(df[, check_vars], colMeans(df[, check_vars], na.rm = TRUE), cov(df[, check_vars]))
-# plot(density(mah[mah<50]))
-# sum(mah > 12)
-# df[order(mah, decreasing = TRUE)[1:10], ]
-# df[order(mah, decreasing = TRUE)[11:20], ]
-# table(df$category[mah>12])
-#df[mah > 12 & df$category == "Fragment", ]
+
 df <- df[-unlist(outliers), ]
-#df <- df[!mah>12, ]
 write.csv(df, "df.csv", row.names = FALSE)
-rm(Cat_cat, PT_cat, tmp, missingness, re_categorize, mah, check_vars, h, has_h, num_decimals, illegal_values)
+new_env <- ls()
+rm(list = new_env[!new_env %in% current_env])
+rm("new_env")

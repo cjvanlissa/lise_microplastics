@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "3.6.1",
+    "Version": "3.6.2",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -175,6 +175,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "d9e858795a1a4ebfe6960e4514449d40"
+    },
+    "english": {
+      "Package": "english",
+      "Version": "1.2-4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "e04854310674feda03bc5dbcfac6c8b1"
     },
     "evaluate": {
       "Package": "evaluate",
@@ -517,9 +524,14 @@
     "tidyLPA": {
       "Package": "tidyLPA",
       "Version": "1.0.5",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "ae65895fd850cb5eada12fb0e13a824f"
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "cjvanlissa",
+      "RemoteRepo": "tidyLPA",
+      "RemoteRef": "master",
+      "RemoteSha": "0747888d772df139188fd472341df446f317c9aa",
+      "Hash": "d1c2eb5f4b520f54b46f4748e5b3a90d"
     },
     "tidyr": {
       "Package": "tidyr",

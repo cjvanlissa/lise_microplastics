@@ -48,14 +48,14 @@ output            : papaja::apa6_pdf
 ---
 
 ```{r setup, include = FALSE}
-run_everything = FALSE
-library("papaja")
+run_everything = TRUE
+library(papaja)
+library(english)
 source("setup.r")
 if(run_everything){
   source("clean_data.r")
-} else {
-  df <- read.csv("df.csv", stringsAsFactors = FALSE)
 }
+df <- read.csv("df.csv", stringsAsFactors = FALSE)
 
 ```
 
@@ -88,36 +88,35 @@ To account for the differences in particle dimensionality, we used a stepwise pl
 
 ### Lines
 
-Because lines only vary across one dimension, we conducted univariate mixture models for 1-5 classes with varying means and variances.
 ```{r, results='hide', include=FALSE}
 analyzedat <- df[, c("length", "width", "Film", "Line")]
 
 # Analyze lines ------------------------------------------------------------
 analyze_line <- analyzedat[analyzedat$Line == 1, c("length")]
 
-if(!file.exists("res_line.RData")){
+if(run_everything){
   res_line <- estimate_profiles(analyze_line, 1:5, variances = c("varying"), covariances = c("zero"), package = "MplusAutomation", OUTPUT = "standardized;\nsvalues;", keepfiles = TRUE)
-  res_line_skewt <- estimate_profiles(analyze_line, 1, variances = c("varying"), covariances = c("zero"), package = "MplusAutomation", ANALYSIS = "DISTRIBUTION = skewt;", OUTPUT = "standardized;\nsvalues;", keepfiles = TRUE)
   saveRDS(res_line, "res_line.RData")
-  saveRDS(res_line_skewt, "res_line_skewt.RData")
 } else {
   res_line <- readRDS("res_line.RData")
-  res_line_skewt <- readRDS("res_line_skewt.RData")
 }
-res_line$model_skewt_class_1 <- res_line_skewt$model_2_class_1
+plot(res_line)
 comp_line <- compare_solutions(res_line)
-plot_bic(comp_line)
+
+pdf("fig1.pdf")
 p <- plot_density(res_line, facet_labels = c("model 2 class 1" = "1 class",
                                         "model 2 class 2" = "2 class",
                                         "model 2 class 3" = "3 class",
                                         "model 2 class 4" = "4 class",
                                         "model 2 class 5" = "5 class"))+ theme(legend.position = "none")
+dev.off()
 ```
+
+Because lines only vary across one dimension, we conducted univariate mixture models for 1-5 classes with varying means and variances. As indicated in Table \@ref(tab:tabclasslines1), BIC indicated that the 3-class model fitted best. However, the difference in BIC with the 2-class model was trivial, and the entropy of a 2-class solution was much higher. Most importantly, visual inspection of the solution (Figure \@ref(fig:figclasslines1)) clearly revealed a bimodal distribution. We thus chose a 2-class solution.
+
 ```{r tabclasslines1, results = "asis"}
 tab_class(comp_line)
 ```
-
-As indicated in Table \@ref(tab:tabclasslines1), BIC indicated that the 3-class model fitted best. However, the difference in BIC with the 2-class model was trivial, and the entropy of a 2-class solution was much higher. Most importantly, visual inspection of the solution (Figure \@ref(fig:figclasslines1)) clearly revealed a bimodal distribution. We thus chose a 2-class solution.
 
 ```{r figclasslines1, out.width="100%", fig.cap="Mixture model of lines"}
 p
@@ -125,34 +124,28 @@ p
 
 ### Film
 
-For film, we conducted bivariate mixture models for 1-5 classes. We compared models with varying means and variances, to models that also included varying covariances.
-```{r, results = "hide"}
+```{r, results = "hide", include = FALSE}
 # Analyze film ------------------------------------------------------------
 analyze_film <- analyzedat[analyzedat$Film == 1, c("length", "width")]
 
-if(!file.exists("res_film.RData")){
+if(run_everything){
   res_film <- estimate_profiles(analyze_film, 1:5, variances = c("varying", "varying"), covariances = c("equal", "varying"), package = "MplusAutomation", OUTPUT = "standardized;\nsvalues;", keepfiles = TRUE)
-  res_film_skewt <- estimate_profiles(analyze_film, 1:2, variances = c("varying"), covariances = c("equal"), package = "MplusAutomation", ANALYSIS = "DISTRIBUTION = skewt;", OUTPUT = "standardized;\nsvalues;", keepfiles = TRUE)
   saveRDS(res_film, "res_film.RData")
-  saveRDS(res_film_skewt, "res_film_skewt.RData")
-  
 } else {
   res_film <- readRDS("res_film.RData")
-  res_film_skewt <- readRDS("res_film_skewt.RData")
 }
 comp_film <- compare_solutions(res_film)
 res_film
 
 # Use plot to interpret BIC change
-plot_bic(comp_film)
+plot(res_film)
 
-# Maybe use Skew-T distribution instead of two classes?
 ```
+For film, we conducted bivariate mixture models for 1-5 classes. We compared models with varying means and variances, to models that also included varying covariances. As indicated in Table \@ref(tab:tabclassfilm2), BIC values hardly differed between the models with fixed, and free covariances. We thus prefer the simpler models with fixed covariances. Furthermore, BIC showed a substantial drop from the 1- to 2-class solution, followed by a smaller drop to the 3-class solution, after which the decrease stabilized. Entropy was higher for the 2-class than for the 3-class solution, indicating that the two classes were more clearly separable. Visual inspection of the solutions (Figures \@ref(fig:figclassfilm2) and \@ref(fig:figclassfilm3)) were inconclusive. Per Occam's razor, we thus retained the simpler 2-class solution.
+
 ```{r tabclassfilm2, results = "asis"}
 tab_class(comp_film)
 ```
-
-As indicated in Table \@ref(tab:tabclassfilm2), BIC values hardly differed between the models with fixed, and free covariances. We thus prefer the simpler models with fixed covariances. Furthermore, BIC showed a substantial drop from the 1- to 2-class solution, followed by a smaller drop to the 3-class solution, after which the decrease stabilized. Entropy was higher for the 2-class than for the 3-class solution, indicating that the two classes were more clearly separable. Visual inspection of the solutions (Figures \@ref(fig:figclassfilm2) and \@ref(fig:figclassfilm3)) were inconclusive. Per Occam's razor, we thus retained the simpler 2-class solution.
 
 ```{r figclassfilm2, out.width="100%", fig.cap="Mixture model of film with free means and variances, and fixed covariances"}
 plot_bivariate(res_film$model_4_class_2)
@@ -164,54 +157,26 @@ plot_bivariate(res_film$model_4_class_3)
 
 ### Other
 
-For the remaining particles, we conducted the same bivariate mixture models as for film.
-```{r, results = "hide"}
-analyze_other <- df[!(analyzedat$Film == 1|analyzedat$Line == 1), c("length",  "height_obs", "width")]
+```{r, results = "hide", include=FALSE}
+analyze_other <- df[!(analyzedat$Film == 1|analyzedat$Line == 1), c("length", "width")]
 
-if(!file.exists("res_other.RData")){
-  res_other <- estimate_profiles(analyze_other, 1:5, variances = c("varying", "varying"), covariances = c("equal", "varying"), package = "MplusAutomation")
-  #res_other_skewt <- estimate_profiles(analyze_other, 1:2, variances = "varying", covariances = "equal", package = "MplusAutomation", keepfiles = TRUE, ANALYSIS = "DISTRIBUTION = skewt;\n")
+if(run_everything){
+  res_other <- estimate_profiles(analyze_other, 1:5, variances = c("varying", "varying"), covariances = c("equal", "varying"), package = "MplusAutomation", OUTPUT = "standardized;\nsvalues;", keepfiles = TRUE)
   saveRDS(res_other, "res_other.RData")
 } else {
   res_other <- readRDS("res_other.RData")
 }
 res_other
-
+plot(res_other)
 comp_other <- compare_solutions(res_other)
-
-plot_bic(comp_other)
-#plot_bivariate(res_other$model_4_class_2)
-
-
-# Fixed covariances, two class solution
-
-#plot_profiles(res_other[[1]])
-#class(res_other[[1]]$dff)
-
-# Maybe use Skew-t distribution instead of two classes?
-# skewt <- readModels(filefilter = "skewt")
-#saveRDS(skewt, "c:/git_repositories/tidyLPA/tmp.RData")
-# skewt <- tidyLPA:::as.tidyLPA(skewt)
-# res_skewt <- res_other
-# res_skewt[names(skewt)] <- skewt
-# Df < 3 means the skewness parameter is not defined. Using data with outliers, the df are even <2, which means that the variance parameter is not defined either. Don't use skewt
-df_plot <- res_other$model_4_class_2$dff
-df_plot$Class <- factor(df_plot$Class)
-ggplot(df_plot, aes(x = length, colour = Class, fill = Class))+geom_histogram(bins = 200)
-ggplot(df_plot, aes(x=length, color=Class)) +
-  geom_histogram(fill="white", alpha=0.5, position="identity")
-# No: Skew-t distribution is not well suited for floor effects. However, the model doesn't truly have a floor, because there is variability around the threshold (caused by the sieving)
-# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2921717/
-# http://www.statmodel.com/discussion/messages/11/18722.html?1536050708
-  
 ```
+
+For the remaining particles, we conducted the same bivariate mixture models as for film. Similar to the models for film, BIC values hardly differed between the models with fixed, and free covariances, Table \@ref(tab:tabclassother3). We thus prefer the simpler models with fixed covariances. Furthermore, BIC showed a substantial drop from the 1- to 2-class solution, after which the decrease stabilized. Entropy was higher for the 2-class than for the 3-class solution, indicating that the two classes were more clearly separable. Visual inspection of the solutions (Figures \@ref(fig:figclassother4) and \@ref(fig:figclassother5)) were inconclusive. Per Occam's razor, we thus retained the simpler 2-class solution. 
+
+
 ```{r tabclassother3, results = "asis"}
 tab_class(comp_other)
 ```
-
-Similar to the models for film, BIC values hardly differed between the models with fixed, and free covariances, Table \@ref(tab:tabclassother3). We thus prefer the simpler models with fixed covariances. Furthermore, BIC showed a substantial drop from the 1- to 2-class solution, followed by a smaller drop to the 3-class solution, after which the decrease stabilized. Entropy was higher for the 2-class than for the 3-class solution, indicating that the two classes were more clearly separable. Visual inspection of the solutions (Figures \@ref(fig:figclassother4) and \@ref(fig:figclassother5)) were inconclusive. Per Occam's razor, we thus retained the simpler 2-class solution. 
-
-It appears that the distribution of other particles might be captured more accurately by a strongly skewed density function, such as the skewed t-distribution. Although the BIC for a 1-class solution with a skewed t-distribution was slightly lower than for a 2-class solution with normal distributions, the estimate for *df* was low, and the estimate for skewness was infinite, making this solution impractical for modeling purposes. Future work should explore the optimal density function to describe this distribution.
 
 ```{r figclassother4, out.width="100%", fig.cap="Mixture model of other particles with free means and variances, and fixed covariances"}
 plot_bivariate(res_other$model_4_class_2)
@@ -221,7 +186,127 @@ plot_bivariate(res_other$model_4_class_2)
 plot_bivariate(res_other$model_4_class_3)
 ```
 
-<!-- Robust SE of multilevel voor de verschillende samples? -->
+## Combining the classes
+
+```{r, results = "hide", include = FALSE}
+df_combined <- df
+df_combined[paste0("c", 1:6)] <- 0
+df_combined[df_combined$Line == 1, paste0("c", 1:2)] <- 1
+df_combined$width[df_combined$category == "Line"] <- NA
+df_combined[df_combined$Film == 1, paste0("c", 3:4)] <- 1
+df_combined[!(df_combined$Line == 1 | df_combined$Film == 1), paste0("c", 5:6)] <- 1
+df_combined <- df_combined[, c("sample", "length", "width", "height_obs", paste0("c", 1:6))]
+if(run_everything){
+  model <- mplusObject(TITLE = "Combined model",
+                       VARIABLE = "USEVARIABLES = length width c1 c2 c3 c4 c5 c6;\nCLASSES = c(6);\nTRAINING = c1 c2 c3 c4 c5 c6;\nCLUSTER = sample;",
+                       ANALYSIS = c("
+                                    TYPE = complex mixture;",
+                                    "STARTS = 100 10;",
+                                    "STITERATIONS = 20;"),
+                       MODEL = c("%c#1%",
+                                 "length (vlength1);",
+                                 "width (vwidth3);",
+                                 "[ length*14.07023 ];",
+                                 "[width@0];",
+                                 "length WITH width (lengthWwidth3);",
+                                 "%c#2%",
+                                 "length (vlength2);",
+                                 "width (vwidth3);",
+                                 "[ length*48.96305 ];",
+                                 "[width@0];",
+                                 "length WITH width (lengthWwidth3);",
+                                 "%c#3%",
+                                 "length (vlength3);",
+                                 "width (vwidth3);",
+                                 "[ length*3.06779 ];",
+                                 "[ width*1.89682 ];",
+                                 "length WITH width (lengthWwidth3);",
+                                 "%c#4%",
+                                 "length (vlength4);",
+                                 "width (vwidth4);",
+                                 "[ length*9.29501 ];",
+                                 "[ width*5.63437 ];",
+                                 "length WITH width (lengthWwidth3);",
+                                 "%c#5%",
+                                 "length (vlength5);",
+                                 "width (vwidth5);",
+                                 "[ length*2.20399 ];",
+                                 "[ width*1.56727 ];",
+                                 "length WITH width (lengthWwidth5);",
+                                 "%c#6%",
+                                 "length (vlength6);",
+                                 "width (vwidth6);",
+                                 "[ length*5.10412 ];",
+                                 "[ width*3.40502 ];",
+                                 "length WITH width (lengthWwidth5);"), 
+                       OUTPUT = c("TECH14;",
+                                  "standardized;",
+                                  "svalues;"),
+                       SAVEDATA = c("FILE IS combined_save.dat;",
+                                    "SAVE = cprobabilities;"),
+                       rdata = df_combined)
+  manual_combined <- mplusModeler(model, modelout = "combined.inp", run = 1L)$results
+} else {
+  manual_combined <- readModels("combined.out")
+}
+res <- tidyLPA:::as.tidyLPA(manual_combined)
+```
+
+To combine the models for lines, films, and other particles, we estimated a six-class mixture model. We used dummy variables to restrict potential class membership for the three categories to two classes each. Parameters involving width were not estimated for line classes. To account for non-independence of observations due to the clustered sampling, we used a sandwich estimator for the standard errors.
+
+The resulting model discriminated well between classes, Entropy $`r report(res[["model_unknown_model_1_class_6"]][["fit"]]["Entropy"])`$, posterior classification probabilities $[`r report(res[["model_unknown_model_1_class_6"]][["fit"]]["prob_min"], equals = FALSE)`, `r report(res[["model_unknown_model_1_class_6"]][["fit"]]["prob_max"], equals = FALSE)`]$, AIC `r report(res[["model_unknown_model_1_class_6"]][["fit"]]["AIC"])`, BIC `r report(res[["model_unknown_model_1_class_6"]][["fit"]]["BIC"])`. The parameters of this classification are displayed in Tables \@ref(tab:tabfinal1)-\@ref(tab:tabfinal3).
+
+```{r tabfinal1, results = "asis"}
+tab <- manual_combined$parameters$unstandardized
+tabstd <- manual_combined$parameters$stdyx.standardized
+#tab <- readRDS("c:/git_repositories/lise_paper/tab.RData")
+tab <- tab[tab$param %in% c("LENGTH", "WIDTH"), ]
+tabstd <- tabstd[tabstd$param %in% c("LENGTH", "WIDTH"), ]
+tab[grepl("WITH$", tab$paramHeader), c("est", "se", "pval")] <- 
+  tabstd[grepl("WITH$", tabstd$paramHeader), c("est", "se", "pval")]
+tab$CI <- confint(tab$est, se = tab$se)
+tab$label <- paste0(tab$paramHeader, ".", tab$param)
+tab <- tab[, c(9, 3, 8,7)]
+tmp <- reshape(tab, v.names = c("est", "CI"), timevar = "LatentClass", idvar = "label", direction = "wide")
+names(tmp)<- c("Parameter", rep(c("Est", "CI"), 6))
+tmp$Parameter <- c("$r_{\\text{length}, \\text{width}}$", "$M_{\\text{length}}$", "$M_{\\text{width}}$", "$s^2_{\\text{length}}$", "$s^2_{\\text{width}}$")
+
+colspans <- mapply(function(x, y){c(x, y)}, x = seq(from = 2, to = 13, by = 2), y = seq(from = 3, to = 13, by = 2), SIMPLIFY = FALSE)
+names(colspans) <- paste0("Class ", 1:6, " (N = ", table(manual_combined$savedata$C), ")")
+tb <- tmp[c(2,4), 1:5]
+names(tb)[4:5] <- names(tb)[2:3]
+rownames(tb) <- NULL
+apa_table(tb, col_spanners = colspans[1:2], escape = FALSE, format.args = list(na_string = ""))
+```
+
+```{r tabfinal2, results = "asis"}
+colspans2 <- list(c(2,3), c(4,5))
+names(colspans2) <- names(colspans)[3:4]
+tb <- tmp[, c(1, 6:9)]
+names(tb)[4:5] <- names(tb)[2:3]
+rownames(tb) <- NULL
+apa_table(tb, col_spanners = colspans2, escape = FALSE,format.args = list(na_string = ""))
+```
+```{r tabfinal3, results = "asis"}
+colspans3 <- list(c(2,3), c(4,5))
+names(colspans3) <- names(colspans)[5:6]
+tb <- tmp[, c(1, 10:13)]
+names(tb)[4:5] <- names(tb)[2:3]
+rownames(tb) <- NULL
+apa_table(tb, col_spanners = colspans3, escape = FALSE,  format.args = list(na_string = ""))
+```
+
+
+## Observed height
+
+```{r, echo = FALSE}
+df_height <- manual_combined$savedata
+df_height <- cbind(Height = df$height_obs, df_height)
+tab_height <- table(df_height$C, is.na(df_height$Height))
+height_cors <- cor(df_height[df_height$C == 6, c("LENGTH", "WIDTH", "Height")], use = "pairwise.complete.obs")
+```
+Observed height was only assessed for particles with one dimension exceeding 5mm. Consequently, we did not involve it in the classification procedure, but we do explore relationships with observed height as a distal outcome. First, we examined the prevalence of observed height measurements across the six particle classes, based on most likely class membership. We found that only `r as.english(sum(tab_height[1:5, 1]))` particles with observed height were not classified as *large fragments*. Consequently, we procede to analyze observed height only for particles classified as *large fragments*. For these particles, we found that length was uncorrelated with height, $r `r report(height_cors[1,3])`$, and width had a small correlation with height, $r `r report(height_cors[2,3])`$. This again reinforces the notion that larger particles display greater heterogeneity in shapes.
+
 \newpage
 
 # References

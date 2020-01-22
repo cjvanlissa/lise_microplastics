@@ -15,3 +15,7 @@
 *.dgm
 manuscript_files/
 methods_files/
+dev/
+figure/
+renv/
+*.md

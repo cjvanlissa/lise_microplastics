@@ -74,9 +74,9 @@ With regard to the dimensionality of particles, we can distinguish three cases:
 
 1. A *line* is defined as a particle that varies substantially along one dimension, and negligibly along the other two dimensions. Lines are often twisted, and therefore, it is difficult to measure their length directly. To estimate length, we divided the measured area of lines by a constant value (determined based on a sample of ...). We include a dichotomous indicator variable to distinguish lines from other particles.
 2. A *film* is defined as a particle that varies substantially along two dimensions, and negligibly along the third. We have measured the Feret length and width of these particles, which describes them accurately. We include a dichotomous indicator variable to distinguish films from other particles.
-3. All other particles vary substantially along three dimensions. For small particles (all dimensions < 5mm), we measured Feret length and width. For larger particles, we additionally measured height. <!--Assuming that three-dimensional particles are randomly oriented on the plane, we can assume that the correlation between the first two dimensions is similar in size to the correlation between each dimension and the third.-->
+3. All other particles vary substantially along three dimensions. For small particles (all dimensions < 5mm), we measured Feret length and width. For larger particles, we additionally measured height.
 
-<!--Because the dimensionality of particles was assessed based on bounding boxes in two-dimensional photographs, we have to take some limitations into account. We do, however, have some information about height, -->
+Prior to analyses, we removed outliers separately for particles in these three categories. For lines, outliers were identified as cases with an absolute standardized value $> 3$. For films and other particles, outliers were identified as having a Mahalanobis distance $> 13.82$.
 
 ## Strategy of analyses
 

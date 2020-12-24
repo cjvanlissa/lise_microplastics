@@ -1,6 +1,6 @@
-Mplus VERSION 8
+Mplus VERSION 8.3
 MUTHEN & MUTHEN
-01/22/2020  10:39 PM
+12/24/2020  12:28 PM
 
 INPUT INSTRUCTIONS
 
@@ -154,7 +154,7 @@ SUMMARY OF DATA
      Number of missing data patterns             2
      Number of y missing data patterns           2
      Number of u missing data patterns           0
-     Number of clusters          21
+     Number of clusters                         21
 
 
 
@@ -240,12 +240,12 @@ BASED ON THE ESTIMATED MODEL
     Latent
    Classes
 
-       1        241.93182          0.03583
-       2        239.06818          0.03540
+       1        241.93166          0.03583
+       2        239.06834          0.03540
        3        647.70284          0.09591
        4        148.29716          0.02196
-       5       4081.01963          0.60433
-       6       1394.98037          0.20657
+       5       4081.01951          0.60433
+       6       1394.98049          0.20657
 
 
 FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES
@@ -794,8 +794,8 @@ SAVEDATA INFORMATION
   Save file record length    10000
 
 
-     Beginning Time:  22:39:43
-        Ending Time:  22:39:54
+     Beginning Time:  12:28:16
+        Ending Time:  12:28:27
        Elapsed Time:  00:00:11
 
 
@@ -809,4 +809,4 @@ Fax: (310) 391-8971
 Web: www.StatModel.com
 Support: Support@StatModel.com
 
-Copyright (c) 1998-2017 Muthen & Muthen
+Copyright (c) 1998-2019 Muthen & Muthen

@@ -7,7 +7,7 @@ library(MplusAutomation)
 tab_class <- function(x){
   tab <- x$fits[, c("Classes", "LogLik", "BIC", "Entropy", "prob_min", "prob_max", "n_min", "n_max", "BLRT_p")]
   names(tab) <- c("Classes", "LL", "BIC", "Entropy", "$p_{min}$", "$p_{max}$", "$n_{min}$", "$n_{max}$", "$p_{BLRT}$")
-  papaja::apa_table(tab, escape = FALSE, format.args = list(na_string = ""))
+  tab
 }
 
 plot_bic <- function(x){

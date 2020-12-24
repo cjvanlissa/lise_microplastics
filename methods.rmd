@@ -1,62 +1,21 @@
 ---
-title             : "Rethinking microplastics: mapping the continuous and interrelated nature of shape, size and density of marine plastics in distributions"
-shorttitle        : "Rethinking microplastics"
-
-author: 
-  - name          : "Lise Alkema"
-    affiliation   : "1"
-    corresponding : yes
-    address       : "Postal address"
-    email         : "my@email.com"
-  - name          : "Caspar J. van Lissa"
-    affiliation   : "2"
-  - name          : "Merel Kooi"
-    affiliation   : "1"
-  - name          : "A. A. Koelmans"
-    affiliation   : "1"
-
-affiliation:
-  - id            : "1"
-    institution   : "Wageningen University"
-  - id            : "2"
-    institution   : "Utrecht University, department of Methodology & Statistics"
-
-authornote: |
-  Add complete departmental affiliations for each author here. Each new line herein must be indented, like this line.
-
-  Enter author note here.
-
-abstract: |
-  Methods
-  
-keywords          : "microplastics, plastic, maritime, mixture model"
-wordcount         : "X"
-
-bibliography      : ["r-references.bib"]
-
-floatsintext      : no
-figurelist        : no
-tablelist         : no
-footnotelist      : no
-linenumbers       : yes
-mask              : no
-draft             : no
-
-documentclass     : "apa6"
-classoption       : "man"
-output            : papaja::apa6_pdf
+title: "Rethinking microplastics: mapping the continuous and interrelated nature of shape, size and density of marine plastics in distributions"
+author: "Lise Alkema, Caspar J. van Lissa, Merel Kooi, & A. A. Koelmans"
+date: "12/24/2020"
+output: bookdown::html_document2
 ---
 
+
 ```{r setup, include = FALSE}
-run_everything = TRUE
-library(papaja)
+run_everything = FALSE
 library(english)
+library(bookdown)
+library(psych)
 source("setup.r")
 if(run_everything){
   source("clean_data.r")
 }
 df <- read.csv("df.csv", stringsAsFactors = FALSE)
-
 ```
 
 ```{r analysis-preferences}
@@ -92,7 +51,7 @@ To account for the differences in particle dimensionality, we used a stepwise pl
 analyzedat <- df[, c("length", "width", "Film", "Line")]
 
 # Analyze lines ------------------------------------------------------------
-analyze_line <- analyzedat[analyzedat$Line == 1, c("length")]
+analyze_line <- analyzedat[analyzedat$Line == 1, c("length"), drop = FALSE]
 
 if(run_everything){
   res_line <- estimate_profiles(analyze_line, 1:5, variances = c("varying"), covariances = c("zero"), package = "MplusAutomation", OUTPUT = "standardized;\nsvalues;", keepfiles = TRUE)
@@ -115,7 +74,8 @@ dev.off()
 Because lines only vary across one dimension, we conducted univariate mixture models for 1-5 classes with varying means and variances. As indicated in Table \@ref(tab:tabclasslines1), BIC indicated that the 3-class model fitted best. However, the difference in BIC with the 2-class model was trivial, and the entropy of a 2-class solution was much higher. Most importantly, visual inspection of the solution (Figure \@ref(fig:figclasslines1)) clearly revealed a bimodal distribution. We thus chose a 2-class solution.
 
 ```{r tabclasslines1, results = "asis"}
-tab_class(comp_line)
+options(knitr.kable.NA = '')
+knitr::kable(tab_class(comp_line), caption = "Line classification", escape = FALSE)
 ```
 
 ```{r figclasslines1, out.width="100%", fig.cap="Mixture model of lines"}
@@ -144,7 +104,7 @@ plot(res_film)
 For film, we conducted bivariate mixture models for 1-5 classes. We compared models with varying means and variances, to models that also included varying covariances. As indicated in Table \@ref(tab:tabclassfilm2), BIC values hardly differed between the models with fixed, and free covariances. We thus prefer the simpler models with fixed covariances. Furthermore, BIC showed a substantial drop from the 1- to 2-class solution, followed by a smaller drop to the 3-class solution, after which the decrease stabilized. Entropy was higher for the 2-class than for the 3-class solution, indicating that the two classes were more clearly separable. Visual inspection of the solutions (Figures \@ref(fig:figclassfilm2) and \@ref(fig:figclassfilm3)) were inconclusive. Per Occam's razor, we thus retained the simpler 2-class solution.
 
 ```{r tabclassfilm2, results = "asis"}
-tab_class(comp_film)
+knitr::kable(tab_class(comp_film), caption = "Film classification")
 ```
 
 ```{r figclassfilm2, out.width="100%", fig.cap="Mixture model of film with free means and variances, and fixed covariances"}
@@ -175,7 +135,7 @@ For the remaining particles, we conducted the same bivariate mixture models as f
 
 
 ```{r tabclassother3, results = "asis"}
-tab_class(comp_other)
+knitr::kable(tab_class(comp_other), caption = "Other classification")
 ```
 
 ```{r figclassother4, out.width="100%", fig.cap="Mixture model of other particles with free means and variances, and fixed covariances"}
@@ -276,7 +236,7 @@ names(colspans) <- paste0("Class ", 1:6, " (N = ", table(manual_combined$savedat
 tb <- tmp[c(2,4), 1:5]
 names(tb)[4:5] <- names(tb)[2:3]
 rownames(tb) <- NULL
-apa_table(tb, col_spanners = colspans[1:2], escape = FALSE, format.args = list(na_string = ""))
+knitr::kable(tb, escape = FALSE, caption = "Combined model, part 1", format.args = list(na_string = ""))
 ```
 
 ```{r tabfinal2, results = "asis"}
@@ -285,7 +245,7 @@ names(colspans2) <- names(colspans)[3:4]
 tb <- tmp[, c(1, 6:9)]
 names(tb)[4:5] <- names(tb)[2:3]
 rownames(tb) <- NULL
-apa_table(tb, col_spanners = colspans2, escape = FALSE,format.args = list(na_string = ""))
+knitr::kable(tb, escape = FALSE, caption = "Combined model, part 2",format.args = list(na_string = ""))
 ```
 ```{r tabfinal3, results = "asis"}
 colspans3 <- list(c(2,3), c(4,5))
@@ -293,7 +253,7 @@ names(colspans3) <- names(colspans)[5:6]
 tb <- tmp[, c(1, 10:13)]
 names(tb)[4:5] <- names(tb)[2:3]
 rownames(tb) <- NULL
-apa_table(tb, col_spanners = colspans3, escape = FALSE,  format.args = list(na_string = ""))
+knitr::kable(tb, escape = FALSE, caption = "Combined model, part 3", format.args = list(na_string = ""))
 ```
 
 
@@ -308,11 +268,6 @@ height_cors <- cor(df_height[df_height$C == 6, c("LENGTH", "WIDTH", "Height")], 
 Observed height was only assessed for particles with one dimension exceeding 5mm. Consequently, we did not involve it in the classification procedure, but we do explore relationships with observed height as a distal outcome. First, we examined the prevalence of observed height measurements across the six particle classes, based on most likely class membership. We found that only `r as.english(sum(tab_height[1:5, 1]))` particles with observed height were not classified as *large fragments*. Consequently, we procede to analyze observed height only for particles classified as *large fragments*. For these particles, we found that length was uncorrelated with height, $r `r report(height_cors[1,3])`$, and width had a small correlation with height, $r `r report(height_cors[2,3])`$. This again reinforces the notion that larger particles display greater heterogeneity in shapes.
 
 \newpage
-
-# References
-```{r create_r-references}
-r_refs(file = "r-references.bib")
-```
 
 \begingroup
 \setlength{\parindent}{-0.5in}

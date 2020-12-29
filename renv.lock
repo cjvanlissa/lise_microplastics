@@ -72,6 +72,13 @@
       "Repository": "CRAN",
       "Hash": "e0d7ac80256d60b416b87ac88711d4b4"
     },
+    "bookdown": {
+      "Package": "bookdown",
+      "Version": "0.21",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "2f2d1ea7131e7928d67c684942cc1570"
+    },
     "boot": {
       "Package": "boot",
       "Version": "1.3-25",
@@ -550,15 +557,15 @@
     },
     "tidyLPA": {
       "Package": "tidyLPA",
-      "Version": "1.0.9.1",
+      "Version": "1.0.9.3",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteUsername": "cjvanlissa",
       "RemoteRepo": "tidyLPA",
       "RemoteRef": "master",
-      "RemoteSha": "3a7efdcb0c20613c5b7fceb45914cd33a3fdac6b",
-      "Hash": "ae58904c28535b1ef46bbd8738023ec9"
+      "RemoteSha": "57718fecf54a13ce7946217db07b559733061b6a",
+      "Hash": "4ecc08684a15ea8304b0a7686287f073"
     },
     "tidyselect": {
       "Package": "tidyselect",

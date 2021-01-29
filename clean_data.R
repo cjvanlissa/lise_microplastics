@@ -54,6 +54,7 @@ re_categorize <- function(x, categories){
 }
 
 df$PT <- factor(df$PT)
+df$PT[df$PT == ""] <- NA
 PT_cat <- list(
   PP = grep("PP", levels(df$PT), value = TRUE),
   PE = grep("^*?PE\\s{0,}$", levels(df$PT), value = TRUE)

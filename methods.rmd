@@ -18,7 +18,7 @@ if(run_everything){
 df <- read.csv("df.csv", stringsAsFactors = FALSE)
 ```
 
-```{r analysis-preferences}
+```{r analysis-preferences, include = FALSE}
 # Seed for random number generation
 set.seed(42)
 knitr::opts_chunk$set(cache.extra = knitr::rand_seed,
@@ -33,9 +33,9 @@ With regard to the dimensionality of particles, we can distinguish three cases:
 
 1. A *line* is defined as a particle that varies substantially along one dimension, and negligibly along the other two dimensions. Lines are often twisted, and therefore, it is difficult to measure their length directly. To estimate length, we divided the measured area of lines by a constant value (determined based on a sample of ...). We include a dichotomous indicator variable to distinguish lines from other particles.
 2. A *film* is defined as a particle that varies substantially along two dimensions, and negligibly along the third. We have measured the Feret length and width of these particles, which describes them accurately. We include a dichotomous indicator variable to distinguish films from other particles.
-3. All other particles vary substantially along three dimensions. For small particles (all dimensions < 5mm), we measured Feret length and width. For larger particles, we additionally measured height.
+3. A *fragment* is defined as a particle that varies along three dimensions. For small particles (all dimensions < 5mm), we measured Feret length and width. For larger particles, we additionally measured height.
 
-Prior to analyses, we removed outliers separately for particles in these three categories. For lines, outliers were identified as cases with an absolute standardized value $> 3$. For films and other particles, outliers were identified as having a Mahalanobis distance $> 13.82$.
+Prior to analyses, we removed outliers separately for particles in these three categories. For lines, outliers were identified as cases with an absolute standardized value $> 3$. For films and fragments, outliers were identified as having a Mahalanobis distance $> 13.82$.
 
 ## Strategy of analyses
 
@@ -115,7 +115,7 @@ plot_bivariate(res_film$model_4_class_2)
 plot_bivariate(res_film$model_4_class_3)
 ```
 
-### Other
+### Fragment
 
 ```{r, results = "hide", include=FALSE}
 analyze_other <- df[!(analyzedat$Film == 1|analyzedat$Line == 1), c("length", "width")]
@@ -135,14 +135,14 @@ For the remaining particles, we conducted the same bivariate mixture models as f
 
 
 ```{r tabclassother3, results = "asis"}
-knitr::kable(tab_class(comp_other), caption = "Other classification")
+knitr::kable(tab_class(comp_other), caption = "Fragment classification")
 ```
 
-```{r figclassother4, out.width="100%", fig.cap="Mixture model of other particles with free means and variances, and fixed covariances"}
+```{r figclassother4, out.width="100%", fig.cap="Mixture model of fragments with free means and variances, and fixed covariances"}
 plot_bivariate(res_other$model_4_class_2)
 ```
 
-```{r figclassother5, out.width="100%", fig.cap="Mixture model of other particles with free means and variances, and fixed covariances"}
+```{r figclassother5, out.width="100%", fig.cap="Mixture model of fragments with free means and variances, and fixed covariances"}
 plot_bivariate(res_other$model_4_class_3)
 ```
 
@@ -212,9 +212,9 @@ if(run_everything){
 res <- tidyLPA:::as.tidyLPA(manual_combined)
 ```
 
-To combine the models for lines, films, and other particles, we estimated a six-class mixture model. We used dummy variables to restrict potential class membership for the three categories to two classes each. Parameters involving width were not estimated for line classes. To account for non-independence of observations due to the clustered sampling (i.e., observations originating from the same haul of the net), we used a sandwich estimator for the standard errors.
+To combine the models for lines, films, and fragments, we estimated a six-class mixture model. We used dummy variables to restrict potential class membership for the three categories to two classes each. Parameters involving width were not estimated for line classes. To account for non-independence of observations due to the clustered sampling (i.e., observations originating from the same haul of the net), we used a sandwich estimator for the standard errors.
 
-The resulting model discriminated well between classes, Entropy $`r report(res[["model_unknown_model_1_class_6"]][["fit"]]["Entropy"])`$, posterior classification probabilities $[`r report(res[["model_unknown_model_1_class_6"]][["fit"]]["prob_min"], equals = FALSE)`, `r report(res[["model_unknown_model_1_class_6"]][["fit"]]["prob_max"], equals = FALSE)`]$, AIC `r report(res[["model_unknown_model_1_class_6"]][["fit"]]["AIC"])`, BIC `r report(res[["model_unknown_model_1_class_6"]][["fit"]]["BIC"])`. The parameters of this classification are displayed in Tables \@ref(tab:tabfinal1)-\@ref(tab:tabfinal3).
+The resulting model discriminated well between classes, Entropy $`r report(res[["model_unknown_model_1_class_6"]][["fit"]]["Entropy"])`$, posterior classification probabilities $[`r report(res[["model_unknown_model_1_class_6"]][["fit"]]["prob_min"], equals = FALSE)`, `r report(res[["model_unknown_model_1_class_6"]][["fit"]]["prob_max"], equals = FALSE)`]$, AIC `r report(res[["model_unknown_model_1_class_6"]][["fit"]]["AIC"])`, BIC `r report(res[["model_unknown_model_1_class_6"]][["fit"]]["BIC"])`. The parameters of this classification are displayed in Tables \@ref(tab:tabfinal1).
 
 ```{r tabfinal1, results = "asis"}
 tab <- manual_combined$parameters$unstandardized
@@ -226,20 +226,19 @@ tab[grepl("WITH$", tab$paramHeader), c("est", "se", "pval")] <-
   tabstd[grepl("WITH$", tabstd$paramHeader), c("est", "se", "pval")]
 tab$CI <- confint(tab$est, se = tab$se)
 tab$label <- paste0(tab$paramHeader, ".", tab$param)
+tab$est <- gsub("***", "*", tidySEM:::est_sig(tab$est, sig = tab$pval), fixed = TRUE)
 tab <- tab[, c(9, 3, 8,7)]
-tmp <- reshape(tab, v.names = c("est", "CI"), timevar = "LatentClass", idvar = "label", direction = "wide")
-names(tmp)<- c("Parameter", rep(c("Est", "CI"), 6))
-tmp$Parameter <- c("$r_{\\text{length}, \\text{width}}$", "$M_{\\text{length}}$", "$M_{\\text{width}}$", "$s^2_{\\text{length}}$", "$s^2_{\\text{width}}$")
+#tmp <- reshape(tab, v.names = c("est", "CI"), timevar = "LatentClass", idvar = "label", direction = "wide")
+names(tab) <- c("Parameter", "Value", "95% CI", "Class")
+tab$Parameter <- c("$r_{\\text{length}, \\text{width}}$", "$M_{\\text{length}}$", "$M_{\\text{width}}$", "$s^2_{\\text{length}}$", "$s^2_{\\text{width}}$")[match(tab$Parameter, c("LENGTH.WITH.WIDTH", "Means.LENGTH", "Means.WIDTH", "Variances.LENGTH", "Variances.WIDTH"))]
+tab$Class <- paste0(rep(c("Line ", "Film ", "Fragment "), each = 10), rep(c(rep(1, 5), rep(2, 5)), 3), " (N = ", table(manual_combined$savedata$C)[tab$Class], ")")
+tab <- tab[!((grepl("width", tab$Parameter) & grepl("Line", tab$Class))), ]
 
-colspans <- mapply(function(x, y){c(x, y)}, x = seq(from = 2, to = 13, by = 2), y = seq(from = 3, to = 13, by = 2), SIMPLIFY = FALSE)
-names(colspans) <- paste0("Class ", 1:6, " (N = ", table(manual_combined$savedata$C), ")")
-tb <- tmp[c(2,4), 1:5]
-names(tb)[4:5] <- names(tb)[2:3]
-rownames(tb) <- NULL
-knitr::kable(tb, escape = FALSE, caption = "Combined model, part 1", format.args = list(na_string = ""))
+rownames(tab) <- NULL
+knitr::kable(tab, escape = FALSE, caption = "Combined model. Note: $M$: Mean, $s^2$: Variance, $r$: Correlation. * = p < .001", format.args = list(na_string = ""))
 ```
 
-```{r tabfinal2, results = "asis"}
+```{r tabfinal2, results = "asis", eval = FALSE}
 colspans2 <- list(c(2,3), c(4,5))
 names(colspans2) <- names(colspans)[3:4]
 tb <- tmp[, c(1, 6:9)]
@@ -247,7 +246,7 @@ names(tb)[4:5] <- names(tb)[2:3]
 rownames(tb) <- NULL
 knitr::kable(tb, escape = FALSE, caption = "Combined model, part 2",format.args = list(na_string = ""))
 ```
-```{r tabfinal3, results = "asis"}
+```{r tabfinal3, results = "asis", eval = FALSE}
 colspans3 <- list(c(2,3), c(4,5))
 names(colspans3) <- names(colspans)[5:6]
 tb <- tmp[, c(1, 10:13)]
@@ -265,7 +264,7 @@ df_height <- cbind(Height = df$height_obs, df_height)
 tab_height <- table(df_height$C, is.na(df_height$Height))
 height_cors <- cor(df_height[df_height$C == 6, c("LENGTH", "WIDTH", "Height")], use = "pairwise.complete.obs")
 ```
-Observed height was only assessed for particles with one dimension exceeding 5mm. Consequently, we did not involve it in the classification procedure, but we do explore relationships with observed height as a distal outcome. First, we examined the prevalence of observed height measurements across the six particle classes, based on most likely class membership. We found that only `r as.english(sum(tab_height[1:5, 1]))` particles with observed height were not classified as *large fragments*. Consequently, we procede to analyze observed height only for particles classified as *large fragments*. For these particles, we found that length was uncorrelated with height, $r `r report(height_cors[1,3])`$, and width had a small correlation with height, $r `r report(height_cors[2,3])`$. This again reinforces the notion that larger particles display greater heterogeneity in shapes.
+Observed height was only assessed for particles with one dimension exceeding 5mm. Consequently, we did not involve it in the classification procedure, but we do explore relationships with observed height as a distal outcome. First, we examined the prevalence of observed height measurements across the six particle classes, based on most likely class membership. We found that only `r as.english(sum(tab_height[1:5, 1]))` particles with observed height were not classified as *large fragments*. Consequently, we analyzed observed height only for particles classified as *large fragments*. For these particles, we found that length was uncorrelated with height, $r `r report(height_cors[1,3])`$, and width had a small correlation with height, $r `r report(height_cors[2,3])`$. This again reinforces the notion that larger particles display greater heterogeneity in shapes.
 
 # Conclusions
 

@@ -5,8 +5,9 @@ library(tidyLPA)
 library(MplusAutomation)
 
 tab_class <- function(x){
-  tab <- x$fits[, c("Classes", "LogLik", "BIC", "Entropy", "prob_min", "prob_max", "n_min", "n_max", "BLRT_p")]
-  names(tab) <- c("Classes", "LL", "BIC", "Entropy", "$p_{min}$", "$p_{max}$", "$n_{min}$", "$n_{max}$", "$p_{BLRT}$")
+  tab <- x$fits[, c("Model", "Classes", "LogLik", "BIC", "Entropy", "prob_min", "prob_max", "n_min", "n_max", "BLRT_p")]
+  tab$Model <- c("Free M, S2", "Free M, S2, r")[match(tab$Model, c(4, 6))]
+  names(tab) <- c("Model", "Classes", "LL", "BIC", "Entropy", "$p_{min}$", "$p_{max}$", "$n_{min}$", "$n_{max}$", "$p_{BLRT}$")
   tab
 }
 

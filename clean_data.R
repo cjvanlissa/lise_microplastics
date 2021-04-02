@@ -53,14 +53,34 @@ re_categorize <- function(x, categories){
   out
 }
 
-df$PT <- factor(df$PT)
+
+# Categorize PT -----------------------------------------------------------
+categories <- read.table("categories.csv", sep = ";", stringsAsFactors = FALSE, header = TRUE)
+categories <- read.table("categories_LM.csv", sep = ";", stringsAsFactors = FALSE, header = TRUE)
+# Make empty cells NA
 df$PT[df$PT == ""] <- NA
+if(!all(df$PT %in% categories$Original)){
+  stop("Couldn't match some cats")
+}
+df$PT[df$PT %in% categories$Original[is.na(categories$Rename)]] <- NA
+for(this_cat in unique(c(NA, categories$Rename))[-1]){
+  #this_cat = "Other"
+  if(!(all(categories$Original[which(categories$Rename == this_cat)] %in% df$PT))){
+    stop("Couldn't match some cats")
+  }
+  df$PT[which(df$PT %in% categories$Original[which(categories$Rename == this_cat)])] <- this_cat
+}
+#table(df$PT, tmp, useNA = "always")
+# Code any cell containing "PP" as "PP"
+df$PT[grepl("PP", df$PT)] <- "PP"
+# Code any cell containing with *(optional)PE as "PE"
+df$PT[grepl("^\\*?PE\\s{0,}$", df$PT)] <- "PE"
+table(df$PT, useNA = "always")
+
 PT_cat <- list(
   PP = grep("PP", levels(df$PT), value = TRUE),
   PE = grep("^*?PE\\s{0,}$", levels(df$PT), value = TRUE)
 )
-df$poly_type <- re_categorize(df$PT, PT_cat)
-#table(df$PT, df$poly_type)
 
 df$cat <- factor(df$category)
 Cat_cat <- list(
@@ -71,9 +91,11 @@ Cat_cat <- list(
   Pellet = grep("pellet", levels(df$cat), value = TRUE)
 )
 df$category <- re_categorize(df$cat, Cat_cat)
+df$category[df$category %in% c(c("Foam", "Pellet"))] <- "Fragment"
+table(df$category)
 #table(df$cat, df$category)
 
-names(df)[match(c("S", "L..mm.", "W..mm.", "A..mm.", "H..mm.", "H..5mm."), names(df))] <- c("sample", "length", "width", "area", "height_est", "height_obs")
+names(df)[match(c("S", "L..mm.", "W..mm.", "A..mm.", "H..mm.", "H..5mm.", "PT"), names(df))] <- c("sample", "length", "width", "area", "height_est", "height_obs", "poly_type")
 
 # For lines, calculate length from area divided by average diameter of a sample of lines,
 # to account for potential curvature of lines inside bounding box
@@ -88,7 +110,7 @@ df$length[df$category == "Line"] <- calculated_lengths
 # tmp <- reshape(tmp, direction = "long", varying = names(tmp))
 # ggplot(tmp, aes(x = Variable, colour = time, fill = time)) + geom_density(alpha = .2)
 #cor(tmp$length, tmp$length_line, use = "pairwise.complete.obs")
-
+browser()
 df <- df[, c("current", "sample", "length", "width", "height_est", "height_obs", "category", "poly_type")]
 
 # Imputed height correlates poorly with actual height, even for the fragments
@@ -140,6 +162,12 @@ outliers <- lapply(list(
   })
 
 df <- df[-unlist(outliers), ]
+# Remove particles shorter than 1 mm
+df <- df[-which(df$length < 1), ]
+# Checking for outliers , we see that the majority of our data for length falls within a 0 1  -10 mm range, with a maximum of 325.8 mm,  and a median of 2.73 mm and a range of 324.79 mm.  For width, we see find a minimum of 0.2 mm, maximum of 55 mm,  and median of 1.66 mm and a range of 54.8 mm . 
+
+tmp <- tidySEM::descriptives(df[, c("length", "width", "height_obs", "category", "poly_type")])
+write.csv(tmp, "descriptives.csv", row.names = FALSE)
 write.csv(df, "df.csv", row.names = FALSE)
 new_env <- ls()
 rm(list = new_env[!new_env %in% current_env])

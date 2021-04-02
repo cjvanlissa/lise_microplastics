@@ -7,7 +7,7 @@ output: bookdown::html_document2
 
 
 ```{r setup, include = FALSE}
-run_everything = FALSE
+run_everything = TRUE
 library(english)
 library(bookdown)
 library(psych)
@@ -212,7 +212,10 @@ if(run_everything){
 res <- tidyLPA:::as.tidyLPA(manual_combined)
 
 # Add distal outcome
+naction <- getOption("na.action")
+options(na.action='na.pass')
 df_comb_3step <- cbind(df_combined, pt = as.numeric(ordered(df$poly_type, levels = c("PE", "PP", "other"))), model.matrix(~poly_type - 1, df))
+options(na.action=naction)
 names(df_comb_3step) <- gsub("poly_type", "", names(df_comb_3step), fixed = TRUE)
 
 if(run_everything){

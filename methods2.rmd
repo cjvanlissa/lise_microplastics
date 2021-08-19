@@ -1,0 +1,376 @@
+---
+title: "Rethinking microplastics: mapping the continuous and interrelated nature of shape, size and density of marine plastics in distributions"
+author: "Lise Alkema, Caspar J. van Lissa, Merel Kooi, & A. A. Koelmans"
+date: "12/24/2020"
+output: bookdown::html_document2
+---
+
+
+```{r setup, include = FALSE}
+run_everything = TRUE
+library(english)
+library(bookdown)
+library(psych)
+library(tidySEM)
+library(OpenMx)
+source("setup.r")
+if(run_everything){
+  source("clean_data.r")
+}
+df <- read.csv("df.csv", stringsAsFactors = FALSE)
+```
+
+```{r analysis-preferences, include = FALSE}
+# Seed for random number generation
+set.seed(42)
+knitr::opts_chunk$set(cache.extra = knitr::rand_seed,
+                      echo = FALSE,
+                      warning = FALSE,
+                      message = FALSE)
+```
+
+# Methods
+
+With regard to the dimensionality of particles, we can distinguish three cases:
+
+1. A *line* is defined as a particle that varies substantially along one dimension, and negligibly along the other two dimensions. Lines are often twisted, and therefore, it is difficult to measure their length directly. To estimate length, we divided the measured area of lines by a constant value (determined based on a sample of ...). We include a dichotomous indicator variable to distinguish lines from other particles.
+2. A *film* is defined as a particle that varies substantially along two dimensions, and negligibly along the third. We have measured the Feret length and width of these particles, which describes them accurately. We include a dichotomous indicator variable to distinguish films from other particles.
+3. A *fragment* is defined as a particle that varies along three dimensions. For small particles (all dimensions < 5mm), we measured Feret length and width. For larger particles, we additionally measured height.
+
+Prior to analyses, we removed outliers separately for particles in these three categories. For lines, outliers were identified as cases with an absolute standardized value $> 3$. For films and fragments, outliers were identified as having a Mahalanobis distance $> 13.82$.
+
+## Strategy of analyses
+
+To account for the differences in particle dimensionality, we used a stepwise plan of analysis:
+
+1. Analyze the three dimensionality categories separately, using only the dimensions relevant for that particle.
+2. Determine the best model and number of classes for each dimensionality category
+3. Create a joint model, with number of classes and starting values based on step 2. Use starting values for the dichotomous indicator variables to ensure lines and films are assigned to the correct classes.
+
+### Lines
+
+```{r, results='hide', include=FALSE}
+analyzedat <- df[, c("length", "width", "Film", "Line")]
+
+# Analyze lines ------------------------------------------------------------
+analyze_line <- analyzedat[analyzedat$Line == 1, c("length"), drop = FALSE]
+
+if(run_everything){
+  res_line <- mx_profiles(analyze_line, 1:5, "varying", "zero")
+  saveRDS(res_line, "res_line.RData")
+  blrt_line <- BLRT(res_line)
+  saveRDS(blrt_line, "blrt_line.RData")
+} else {
+  res_line <- readRDS("res_line.RData")
+  blrt_line <- readRDS("blrt_line.RData")
+}
+plot(res_line)
+comp_line <- table_fit(res_line)
+comp_line[1:nrow(blrt_line), "BLRT_p"] <- blrt_line[, "p", drop = FALSE]
+
+pdf("fig1.pdf")
+p <- plot_density(res_line, facet_labels = c("free var 1" = "1 class",
+                                        "free var 2" = "2 class",
+                                        "free var 3" = "3 class",
+                                        "free var 4" = "4 class",
+                                        "free var 5" = "5 class"))+ theme(legend.position = "none")
+dev.off()
+```
+
+Lines effectively vary only across one dimension. Width and height are small and approximately constant (when compared to the variance in length). Thus, we conducted univariate mixture models, focusing on the dimension of length, estimating 1-5 classes with varying means and variances. As indicated in Table \@ref(tab:tabclasslines1), BIC indicated that the 3-class model fitted best. However, the difference in BIC with the 2-class model was trivial, and the entropy of a 2-class solution was much higher. Most importantly, visual inspection of the solution (Figure \@ref(fig:figclasslines1)) clearly revealed a bimodal distribution. We thus chose a 2-class solution.
+
+```{r tabclasslines1, results = "asis"}
+options(knitr.kable.NA = '')
+kableExtra::kbl(tab_class(comp_line), caption = "Line classification", escape = FALSE, digits =2)
+```
+
+```{r figclasslines1, out.width="100%", fig.cap="Mixture model of lines"}
+p
+```
+
+### Film
+
+```{r, results = "hide", include = FALSE}
+# Analyze film ------------------------------------------------------------
+analyze_film <- analyzedat[analyzedat$Film == 1, c("length", "width")]
+
+if(run_everything){
+  res_film <- mx_profiles(analyze_film, 1:5, variances = c("varying", "varying"), covariances = c("equal", "varying"))
+  saveRDS(res_film, "res_film.RData")
+  blrt_film <- BLRT(res_film)
+  saveRDS(blrt_film, "blrt_film.RData")
+} else {
+  res_film <- readRDS("res_film.RData")
+}
+comp_film <- table_fit(res_film)
+comp_film[1:nrow(blrt_film), "BLRT_p"] <- blrt_film[, "p", drop = FALSE]
+
+```
+For film, we conducted bivariate mixture models of length and width, estimating 1-5 classes. We compared models with varying means and variances, to models that also included varying covariances. As indicated in Table \@ref(tab:tabclassfilm2), BIC values hardly differed between the models with fixed, and free covariances. We thus prefer the simpler models with fixed covariances. Furthermore, BIC showed a substantial drop from the 1- to 2-class solution, followed by a smaller drop to the 3-class solution, after which the decrease stabilized. Entropy was higher for the 2-class than for the 3-class solution, indicating that the two classes were more clearly separable. Visual inspection of the solutions (Figures \@ref(fig:figclassfilm2) and \@ref(fig:figclassfilm3)) were inconclusive. Per Occam's razor, we thus retained the simpler 2-class solution.
+
+```{r tabclassfilm2, results = "asis"}
+knitr::kable(tab_class(comp_film), caption = "Film classification")
+```
+
+```{r figclassfilm2, out.width="100%", fig.cap="Mixture model of film with free means and variances, and fixed covariances"}
+plot_bivariate(res_film$model_4_class_2)
+```
+
+```{r figclassfilm3, out.width="100%", fig.cap="Mixture model of film with free means and variances, and fixed covariances"}
+plot_bivariate(res_film$model_4_class_3)
+```
+
+### Fragment
+
+```{r, results = "hide", include=FALSE}
+analyze_other <- analyzedat[!(analyzedat$Film == 1|analyzedat$Line == 1), c("length", "width")]
+
+if(run_everything){
+    res_other <-  mx_profiles(analyze_other, 1:5, variances = c("varying", "varying"), covariances = c("equal", "varying"), run = TRUE)
+  res_other[[1]]  
+    estimate_profiles(analyze_other, 1:2, variances = c("varying", "varying"), covariances = c("equal", "varying"), package = "MplusAutomation", OUTPUT = "standardized;\nsvalues;", keepfiles = TRUE)
+  saveRDS(res_other, "res_other.RData")
+} else {
+  res_other <- readRDS("res_other.RData")
+}
+res_other
+plot(res_other)
+comp_other <- compare_solutions(res_other)
+```
+
+For the remaining particles, we conducted the same bivariate mixture models as for film, analyzing the length and width of particles. Similar to the models for film, BIC values hardly differed between the models with fixed, and free covariances, Table \@ref(tab:tabclassother3). We thus prefer the simpler models with fixed covariances. Furthermore, BIC showed a substantial drop from the 1- to 2-class solution, after which the decrease stabilized. Entropy was higher for the 2-class than for the 3-class solution, indicating that the two classes were more clearly separable. Visual inspection of the solutions (Figures \@ref(fig:figclassother4) and \@ref(fig:figclassother5)) were inconclusive. Per Occam's razor, we thus retained the simpler 2-class solution. 
+
+
+```{r tabclassother3, results = "asis"}
+knitr::kable(tab_class(comp_other), caption = "Fragment classification")
+```
+
+```{r figclassother4, out.width="100%", fig.cap="Mixture model of fragments with free means and variances, and fixed covariances"}
+plot_bivariate(res_other$model_4_class_2)
+```
+
+```{r figclassother5, out.width="100%", fig.cap="Mixture model of fragments with free means and variances, and fixed covariances"}
+plot_bivariate(res_other$model_4_class_3)
+```
+
+## Combining the classes
+
+```{r, results = "hide", include = FALSE}
+df_combined <- df
+df_combined[paste0("c", 1:6)] <- 0
+df_combined[df_combined$Line == 1, paste0("c", 1:2)] <- 1
+df_combined$width[df_combined$category == "Line"] <- NA
+df_combined[df_combined$Film == 1, paste0("c", 3:4)] <- 1
+df_combined[!(df_combined$Line == 1 | df_combined$Film == 1), paste0("c", 5:6)] <- 1
+df_combined <- df_combined[, c("sample", "length", "width", "height_obs", paste0("c", 1:6))]
+if(run_everything){
+  model <- mplusObject(TITLE = "Combined model",
+                       VARIABLE = "USEVARIABLES = length width c1 c2 c3 c4 c5 c6;\nCLASSES = c(6);\nTRAINING = c1 c2 c3 c4 c5 c6;\nCLUSTER = sample;",
+                       ANALYSIS = c("
+                                    TYPE = complex mixture;",
+                                    "STARTS = 100 10;",
+                                    "STITERATIONS = 20;"),
+                       MODEL = c("%c#1%",
+                                 "length (vlength1);",
+                                 "width (vwidth3);",
+                                 "[ length*14.07023 ];",
+                                 "[width@0];",
+                                 "length WITH width (lengthWwidth3);",
+                                 "%c#2%",
+                                 "length (vlength2);",
+                                 "width (vwidth3);",
+                                 "[ length*48.96305 ];",
+                                 "[width@0];",
+                                 "length WITH width (lengthWwidth3);",
+                                 "%c#3%",
+                                 "length (vlength3);",
+                                 "width (vwidth3);",
+                                 "[ length*3.06779 ];",
+                                 "[ width*1.89682 ];",
+                                 "length WITH width (lengthWwidth3);",
+                                 "%c#4%",
+                                 "length (vlength4);",
+                                 "width (vwidth4);",
+                                 "[ length*9.29501 ];",
+                                 "[ width*5.63437 ];",
+                                 "length WITH width (lengthWwidth3);",
+                                 "%c#5%",
+                                 "length (vlength5);",
+                                 "width (vwidth5);",
+                                 "[ length*2.20399 ];",
+                                 "[ width*1.56727 ];",
+                                 "length WITH width (lengthWwidth5);",
+                                 "%c#6%",
+                                 "length (vlength6);",
+                                 "width (vwidth6);",
+                                 "[ length*5.10412 ];",
+                                 "[ width*3.40502 ];",
+                                 "length WITH width (lengthWwidth5);"), 
+                       OUTPUT = c("TECH14;",
+                                  "standardized;",
+                                  "svalues;"),
+                       SAVEDATA = c("FILE IS combined_save.dat;",
+                                    "SAVE = cprobabilities;"),
+                       rdata = df_combined)
+  manual_combined <- mplusModeler(model, modelout = "combined.inp", run = 1L)$results
+} else {
+  manual_combined <- readModels("combined.out")
+}
+res <- tidyLPA:::as.tidyLPA(manual_combined)
+
+# Add distal outcome
+naction <- getOption("na.action")
+options(na.action='na.pass')
+df_comb_3step <- cbind(df_combined, pt = as.numeric(ordered(df$poly_type, levels = c("PE", "PP", "other"))), model.matrix(~poly_type - 1, df))
+options(na.action=naction)
+names(df_comb_3step) <- gsub("poly_type", "", names(df_comb_3step), fixed = TRUE)
+
+if(run_everything){
+    model_3step <- mplusObject(TITLE = "Combined model 3step",
+                       VARIABLE = "USEVARIABLES = length width c1 c2 c3 c4 c5 c6;\nCLASSES = c(6);\nTRAINING = c1 c2 c3 c4 c5 c6;\nCLUSTER = sample;\nAUXILIARY = other (BCH) pe  (BCH) pp (BCH);",
+                       ANALYSIS = c("TYPE = complex mixture;", 
+"STARTS = 100 10;", "STITERATIONS = 20;"),
+                       MODEL = model$MODEL, 
+                       OUTPUT = model$OUTPUT,
+                       SAVEDATA = c("FILE IS combined_3step_save.dat;",
+                                    "SAVE = cprobabilities;"),
+                       rdata = df_comb_3step)
+  manual_comb_3step <- mplusModeler(model_3step, modelout = "comb_3step.inp", run = 1L)$results
+} else {
+  manual_comb_3step <- readModels("comb_3step.out")
+}
+#res_distal <- tidyLPA:::as.tidyLPA(manual_comb_3step)
+
+# Original model
+
+```
+
+To combine the models for lines, films, and fragments, we estimated a six-class mixture model. We used dummy variables to restrict potential class membership for the three categories to two classes each. Parameters involving width were not estimated for line classes. To account for non-independence of observations due to the clustered sampling (i.e., observations originating from the same haul of the net), we used a sandwich estimator for the standard errors.
+
+The resulting model discriminated well between classes, Entropy $`r report(res[["model_unknown_model_1_class_6"]][["fit"]]["Entropy"])`$, posterior classification probabilities $[`r report(res[["model_unknown_model_1_class_6"]][["fit"]]["prob_min"], equals = FALSE)`, `r report(res[["model_unknown_model_1_class_6"]][["fit"]]["prob_max"], equals = FALSE)`]$, AIC `r report(res[["model_unknown_model_1_class_6"]][["fit"]]["AIC"])`, BIC `r report(res[["model_unknown_model_1_class_6"]][["fit"]]["BIC"])`. The parameters of this classification are displayed in Tables \@ref(tab:tabfinal1).
+
+```{r tabfinal1, results = "asis"}
+tab <- manual_combined$parameters$unstandardized
+tabstd <- manual_combined$parameters$stdyx.standardized
+#tab <- readRDS("c:/git_repositories/lise_paper/tab.RData")
+tab <- tab[tab$param %in% c("LENGTH", "WIDTH"), ]
+tabstd <- tabstd[tabstd$param %in% c("LENGTH", "WIDTH"), ]
+tab[grepl("WITH$", tab$paramHeader), c("est", "se", "pval")] <- 
+  tabstd[grepl("WITH$", tabstd$paramHeader), c("est", "se", "pval")]
+tab$CI <- confint(tab$est, se = tab$se)
+tab$label <- paste0(tab$paramHeader, ".", tab$param)
+tab$est <- gsub("***", "*", tidySEM:::est_sig(tab$est, sig = tab$pval), fixed = TRUE)
+tab <- tab[, c(9, 3, 8,7)]
+#tmp <- reshape(tab, v.names = c("est", "CI"), timevar = "LatentClass", idvar = "label", direction = "wide")
+names(tab) <- c("Parameter", "Value", "95% CI", "Class")
+tab$Parameter <- c("$r_{\\text{length}, \\text{width}}$", "$M_{\\text{length}}$", "$M_{\\text{width}}$", "$s^2_{\\text{length}}$", "$s^2_{\\text{width}}$")[match(tab$Parameter, c("LENGTH.WITH.WIDTH", "Means.LENGTH", "Means.WIDTH", "Variances.LENGTH", "Variances.WIDTH"))]
+tab$Class <- paste0(rep(c("Line ", "Film ", "Fragment "), each = 10), rep(c(rep(1, 5), rep(2, 5)), 3), " (N = ", table(manual_combined$savedata$C)[tab$Class], ")")
+tab <- tab[!((grepl("width", tab$Parameter) & grepl("Line", tab$Class))), ]
+
+rownames(tab) <- NULL
+knitr::kable(tab, escape = FALSE, caption = "Combined model. Note: $M$: Mean, $s^2$: Variance, $r$: Correlation. * = p < .001", format.args = list(na_string = ""))
+```
+
+```{r tabfinal2, results = "asis", eval = FALSE}
+colspans2 <- list(c(2,3), c(4,5))
+names(colspans2) <- names(colspans)[3:4]
+tb <- tmp[, c(1, 6:9)]
+names(tb)[4:5] <- names(tb)[2:3]
+rownames(tb) <- NULL
+knitr::kable(tb, escape = FALSE, caption = "Combined model, part 2",format.args = list(na_string = ""))
+```
+```{r tabfinal3, results = "asis", eval = FALSE}
+colspans3 <- list(c(2,3), c(4,5))
+names(colspans3) <- names(colspans)[5:6]
+tb <- tmp[, c(1, 10:13)]
+names(tb)[4:5] <- names(tb)[2:3]
+rownames(tb) <- NULL
+knitr::kable(tb, escape = FALSE, caption = "Combined model, part 3", format.args = list(na_string = ""))
+```
+
+
+## Observed height
+
+```{r, echo = FALSE}
+df_height <- manual_combined$savedata
+df_height <- cbind(Height = df$height_obs, df_height)
+tab_height <- table(df_height$C, is.na(df_height$Height))
+height_cors <- cor(df_height[df_height$C == 6, c("LENGTH", "WIDTH", "Height")], use = "pairwise.complete.obs")
+```
+Observed height was only assessed for particles with one dimension exceeding 5mm. Consequently, we did not involve it in the classification procedure, but we do explore relationships with observed height as a distal outcome. First, we examined the prevalence of observed height measurements across the six particle classes, based on most likely class membership. We found that only `r as.english(sum(tab_height[1:5, 1]))` particles with observed height were not classified as *large fragments*. Consequently, we analyzed observed height only for particles classified as *large fragments*. For these particles, we found that length was uncorrelated with height, $r `r report(height_cors[1,3])`$, and width had a small correlation with height, $r `r report(height_cors[2,3])`$. This again reinforces the notion that larger particles display greater heterogeneity in shapes.
+
+## Polymer type by class
+
+To determine whether polymer type varied across class,
+while accounting for classification uncertainty,
+we used the three-step method by Bakk & Vermunt, 2014
+(for the general method, see Asparouhov & Muthén, 2014).
+There were significant differences across classes for all
+three polymer types, with all $\chi^2 (5) > 95.42, ps < .001$.
+The resulting distribution of polymer types by class is displayed in Figure \@ref(fig:figpt).
+
+```{r figpt, fig.cap="Proportion of polymer types by latent class."}
+res_3step <- manual_comb_3step$lcCondMeans
+df_plot <- res_3step$overall
+df_plot <- reshape(df_plot, varying = names(df_plot)[2:13], direction = "long", timevar = "Class")
+df_plot$Class <- ordered(unique(tab$Class)[df_plot$Class], levels = unique(tab$Class))
+df_plot$type <- gsub(" .+$", "", df_plot$Class)
+df_plot$num <- gsub("^[a-zA-Z]+\\b (\\d).+?$", "\\1", df_plot$Class)
+names(df_plot)[1] <- "Type"
+ggplot(df_plot, aes(fill = Type, y = m, x = Class)) +
+  geom_bar(position="stack", stat="identity") +
+  scale_x_discrete(expand = c(0,0))+
+  scale_y_continuous(expand = c(0,0))+
+  labs(y = "Proportion", x = NULL) + 
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+
+# Conclusions
+
+These analyses suggest that the (uni- and multivariate) prevalence of ocean plastics is better described by a mixture of (multivariate) normal distributions than by a single (multivariate) normal distribution.
+Mathematical models of ocean plastic prevalence should take this deviation from (multivariate) normality into account.
+
+We initially conducted separate analyses for lines,
+which vary primarily along the length dimension,
+films, which vary primarily along the length and width dimensions,
+and fragments.
+These fragments, like films, vary in length and width - but also in height.
+However, our methods of measurement precluded obtaining height data for smaller particles.
+Therefore, height data were very incomplete, so height was treated as an auxiliary variable.
+We finally combined analyses for all particles in a single model, and reported the results.
+
+The results indicated that, for all types of particles, two classes could be distinguished:
+One class with smaller means and variances, and one class with larger means and variances.
+For films and fragments, we were additionally able to estimate covariances in these classes.
+Although the covariances were fixed to be equal across the two classes,
+they are standardized differently because the variances are freely estimated across the two classes.
+Thus, for films and fragments, we observe different standardized covariances (i.e., correlation coefficients) between length and width in the two classes.
+These correlation coefficients inform us about the (two-dimensional) shape of particles.
+High correlations reflect coextensive shapes (i.e., particles approximately as wide as they are long), whereas low correlations reflect variability in shapes.
+
+For films and fragments, these correlations were stronger in the classes with smaller particles than in the classes with larger particles.
+This implies that small films and fragments are approximately equally wide as they are long.
+By contrast, the correlation between length and width was near-zero for large films ($r = .09$), and moderate for large fragments ($r = .43$).
+These low correlations indicate that larger films and fragments show substantial heterogeneity of shape.
+
+Films, by definition, have limited variability in height.
+Thus, their shape is adequately described by the correlation between length and width.
+Fragments vary in height, but we had only limited measurements of height.
+We therefore cannot make definitive claims about the three-dimensional shape of fragments.
+Moreover, these measurements were biased, because data was primarily missing for smaller particles.
+Extrapolating from the very high correlation between length and width ($r = .93$) observed in small fragments,
+we speculate that, for small fragments, the correlation of these dimensions with height will also be large.
+Future research should investigate whether small fragments are indeed approximately coextensive in three dimensions.
+For large fragments, correlations of height with length ($r < .01$) and width ($r = .24$) were small,
+which indicates that these fragments show substantial variability in three-dimensional shape.
+
+\newpage
+
+\begingroup
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
+
+<div id = "refs"></div>
+\endgroup

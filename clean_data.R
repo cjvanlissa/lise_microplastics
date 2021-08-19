@@ -1,14 +1,17 @@
 current_env <- ls()
-df <- read.csv("data.csv", stringsAsFactors = FALSE, colClasses = "character")
+df <- read.csv("data_thesis_essential columns.csv", sep = ";", dec = ",", na.strings = c("NA", "na", ""), stringsAsFactors = FALSE)
+names(df)[1] <- "current"
+df$A..mm. <- gsub(",", ".", df$A..mm., fixed = TRUE)
+df$H..mm. <- gsub(",", ".", df$H..mm., fixed = TRUE)
 df <- df[, !grepl("^CSF", names(df))]
 missingness <- rowSums(is.na(df))
 #table(missingness)
-df <- df[missingness < 14, ]
+df <- df[missingness < (ncol(df)-1), ]
 
 missingness <- colSums(is.na(df))
 #table(missingness)
 
-df <- df[, !missingness > 5790]
+df <- df[, !missingness > nrow(df)]
 
 illegal_values <- function(x){
   suppressWarnings(
@@ -30,10 +33,6 @@ df$A..mm. <- as.numeric(df$A..mm.)
 #illegal_values(df$H..mm.)
 df$H..mm.[df$H..mm. %in% c("na", "foutje")] <- NA
 df$H..mm. <- as.numeric(df$H..mm.)
-
-#illegal_values(df$D)
-df$D[df$D %in% c("na")] <- NA
-df$D <- as.numeric(df$D)
 
 # Remove imputed H..5mm. values
 has_h <- !is.na(df$H..5mm.) & !df$H..5mm. == ""
@@ -65,9 +64,9 @@ if(!all(df$PT %in% categories$Original)){
 df$PT[df$PT %in% categories$Original[is.na(categories$Rename)]] <- NA
 for(this_cat in unique(c(NA, categories$Rename))[-1]){
   #this_cat = "Other"
-  if(!(all(categories$Original[which(categories$Rename == this_cat)] %in% df$PT))){
-    stop("Couldn't match some cats")
-  }
+  # if(!(all(categories$Original[which(categories$Rename == this_cat)] %in% df$PT))){
+  #   stop("Couldn't match some cats")
+  # }
   df$PT[which(df$PT %in% categories$Original[which(categories$Rename == this_cat)])] <- this_cat
 }
 #table(df$PT, tmp, useNA = "always")
@@ -102,6 +101,13 @@ names(df)[match(c("S", "L..mm.", "W..mm.", "A..mm.", "H..mm.", "H..5mm.", "PT"),
 calculated_lengths <- df$area[df$category == "Line"]/0.42
 calculated_lengths[is.na(calculated_lengths)] <- df$length[df$category == "Line"][which(is.na(calculated_lengths))]
 df$length[df$category == "Line"] <- calculated_lengths
+
+
+# Fix lise's problem about 50 duplicates in 5mm cat -----------------------
+
+# dups <- df$sample %in% c(22, 23, 24, 25, 27)
+# dups <- dups & trimws(df$L.cat.) == "0.5mm"
+# dups <- dups& sample == 22
 # df$length2 <- NA
 # df$length2[df$category == "Line"] <- df$area[df$category == "Line"]/0.42
 # 
@@ -110,7 +116,6 @@ df$length[df$category == "Line"] <- calculated_lengths
 # tmp <- reshape(tmp, direction = "long", varying = names(tmp))
 # ggplot(tmp, aes(x = Variable, colour = time, fill = time)) + geom_density(alpha = .2)
 #cor(tmp$length, tmp$length_line, use = "pairwise.complete.obs")
-browser()
 df <- df[, c("current", "sample", "length", "width", "height_est", "height_obs", "category", "poly_type")]
 
 # Imputed height correlates poorly with actual height, even for the fragments

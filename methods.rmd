@@ -7,7 +7,7 @@ output: bookdown::html_document2
 
 
 ```{r setup, include = FALSE}
-run_everything = TRUE
+run_everything = FALSE
 library(english)
 library(bookdown)
 library(psych)
@@ -71,7 +71,8 @@ p <- plot_density(res_line, facet_labels = c("model 2 class 1" = "1 class",
 dev.off()
 ```
 
-Lines effectively vary only across one dimension. Width and height are small and approximately constant (when compared to the variance in length). Thus, we conducted univariate mixture models, focusing on the dimension of length, estimating 1-5 classes with varying means and variances. As indicated in Table \@ref(tab:tabclasslines1), BIC indicated that the 3-class model fitted best. However, the difference in BIC with the 2-class model was trivial, and the entropy of a 2-class solution was much higher. Most importantly, visual inspection of the solution (Figure \@ref(fig:figclasslines1)) clearly revealed a bimodal distribution. We thus chose a 2-class solution.
+Lines effectively vary only across one dimension. Width and height are small and approximately constant (when compared to the variance in length). Thus, we conducted univariate mixture models, focusing on the dimension of length, estimating 1-5 classes with varying means and variances. As indicated in Table \@ref(tab:tabclasslines1), BIC indicated that the 3-class model fitted best. However, the difference in BIC with the 2-class model was trivial, and the minimum classification probability of a 3-class solution was low, indicating poor separability for at least one class.
+Most importantly, visual inspection of the solution (Figure \@ref(fig:figclasslines1)) suggested a bimodal distribution. We thus chose a 2-class solution.
 
 ```{r tabclasslines1, results = "asis"}
 options(knitr.kable.NA = '')

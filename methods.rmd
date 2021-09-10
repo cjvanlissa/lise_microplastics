@@ -7,7 +7,7 @@ output: bookdown::html_document2
 
 
 ```{r setup, include = FALSE}
-run_everything = FALSE
+run_everything = TRUE
 library(english)
 library(bookdown)
 library(psych)

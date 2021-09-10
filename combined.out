@@ -1,13 +1,13 @@
 Mplus VERSION 8.6
 MUTHEN & MUTHEN
-08/20/2021  10:18 PM
+09/10/2021   1:24 PM
 
 INPUT INSTRUCTIONS
 
   TITLE:
   Combined model
   DATA:
-  FILE = "combined_88bda37d23f794175cdd843d495ee125.dat";
+  FILE = "combined_286a2dfb4c4178f408fd562124b068bd.dat";
 
   VARIABLE:
   NAMES = sample length width c1 c2 c3 c4 c5 c6;
@@ -145,7 +145,7 @@ Random Starts Specifications
   Random seed for generating random starts                       0
 
 Input data file(s)
-  combined_88bda37d23f794175cdd843d495ee125.dat
+  combined_286a2dfb4c4178f408fd562124b068bd.dat
 Input data format  FREE
 
 
@@ -182,28 +182,28 @@ UNIVARIATE SAMPLE STATISTICS
          Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
         Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
 
-     LENGTH                5.030       6.637       1.000    0.03%       1.667      2.240      2.595
-            6942.000     103.100      53.445     137.829    0.01%       3.131      4.923
+     LENGTH                4.269       6.342       1.000    0.03%       1.667      2.238      2.585
+            6942.000      43.088      50.605      89.058    0.01%       3.117      4.875
      WIDTH                 2.058       2.621       0.200    0.02%       1.145      1.455      1.653
             6458.000       1.632      13.699      16.000    0.02%       1.920      2.784
 
 RANDOM STARTS RESULTS RANKED FROM THE BEST TO THE WORST LOGLIKELIHOOD VALUES
 
-17 perturbed starting value run(s) did not converge in the initial stage
+9 perturbed starting value run(s) did not converge in the initial stage
 optimizations.
 
 Final stage loglikelihood values at local maxima, seeds, and initial stage start numbers:
 
-          -21562.148  608496           4
-          -21562.148  783110           72
-          -21562.148  285380           1
-          -21562.148  696773           80
-          -21562.148  366706           29
-          -21562.148  789985           67
-          -21562.148  93468            3
-          -21562.148  436460           89
-          -21562.148  76974            16
-          -21562.148  unperturbed      0
+          -21353.207  407168           44
+          -21353.207  533738           11
+          -21353.207  603842           61
+          -21353.207  341041           34
+          -21353.207  967237           48
+          -21353.207  848890           95
+          -21353.207  481835           57
+          -21353.207  285380           1
+          -21353.207  569833           85
+          -21353.207  399671           13
 
 
 
@@ -221,15 +221,15 @@ Number of Free Parameters                       27
 
 Loglikelihood
 
-          H0 Value                      -21562.148
-          H0 Scaling Correction Factor     18.2866
+          H0 Value                      -21353.207
+          H0 Scaling Correction Factor     18.2905
             for MLR
 
 Information Criteria
 
-          Akaike (AIC)                   43178.295
-          Bayesian (BIC)                 43363.119
-          Sample-Size Adjusted BIC       43277.320
+          Akaike (AIC)                   42760.414
+          Bayesian (BIC)                 42945.238
+          Sample-Size Adjusted BIC       42859.439
             (n* = (n + 2) / 24)
 
 
@@ -240,12 +240,12 @@ BASED ON THE ESTIMATED MODEL
     Latent
    Classes
 
-       1        255.23620          0.03677
-       2        228.76380          0.03295
+       1        257.92880          0.03715
+       2        226.07120          0.03257
        3        704.64307          0.10150
        4        148.35693          0.02137
-       5       4275.70038          0.61592
-       6       1329.29962          0.19149
+       5       4275.70030          0.61592
+       6       1329.29970          0.19149
 
 
 FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES
@@ -254,12 +254,12 @@ BASED ON ESTIMATED POSTERIOR PROBABILITIES
     Latent
    Classes
 
-       1        255.23620          0.03677
-       2        228.76380          0.03295
+       1        257.92880          0.03715
+       2        226.07120          0.03257
        3        704.64307          0.10150
        4        148.35693          0.02137
-       5       4275.70038          0.61592
-       6       1329.29962          0.19149
+       5       4275.70030          0.61592
+       6       1329.29970          0.19149
 
 
 FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES
@@ -270,8 +270,8 @@ Class Counts and Proportions
     Latent
    Classes
 
-       1              288          0.04149
-       2              196          0.02823
+       1              289          0.04163
+       2              195          0.02809
        3              714          0.10285
        4              139          0.02002
        5             4338          0.62489
@@ -280,7 +280,7 @@ Class Counts and Proportions
 
 CLASSIFICATION QUALITY
 
-     Entropy                         0.938
+     Entropy                         0.937
 
 
 Average Latent Class Probabilities for Most Likely Latent Class Membership (Row)
@@ -288,8 +288,8 @@ by Latent Class (Column)
 
            1        2        3        4        5        6
 
-    1   0.858    0.142    0.000    0.000    0.000    0.000
-    2   0.042    0.958    0.000    0.000    0.000    0.000
+    1   0.860    0.140    0.000    0.000    0.000    0.000
+    2   0.049    0.951    0.000    0.000    0.000    0.000
     3   0.000    0.000    0.979    0.021    0.000    0.000
     4   0.000    0.000    0.040    0.960    0.000    0.000
     5   0.000    0.000    0.000    0.000    0.967    0.033
@@ -301,7 +301,7 @@ by Latent Class (Row)
 
            1        2        3        4        5        6
 
-    1   0.968    0.032    0.000    0.000    0.000    0.000
+    1   0.963    0.037    0.000    0.000    0.000    0.000
     2   0.179    0.821    0.000    0.000    0.000    0.000
     3   0.000    0.000    0.992    0.008    0.000    0.000
     4   0.000    0.000    0.100    0.900    0.000    0.000
@@ -314,8 +314,8 @@ by Latent Class (Row)
 
               1        2        3        4        5        6
 
-    1     13.783   10.376    0.000    0.000    0.000    0.000
-    2     12.095   13.618    0.000    0.000    0.000    0.000
+    1     13.778   10.512    0.000    0.000    0.000    0.000
+    2     12.097   13.618    0.000    0.000    0.000    0.000
     3      0.000    0.000   13.808    8.964    0.000    0.000
     4      0.000    0.000   11.515   13.710    0.000    0.000
     5     -9.852   -9.852   -9.852   -9.852    3.944    0.000
@@ -333,11 +333,11 @@ Latent Class 1
     WIDTH              0.886      0.110      8.026      0.000
 
  Means
-    LENGTH            14.153      0.801     17.677      0.000
+    LENGTH             9.320      0.569     16.374      0.000
     WIDTH              0.000      0.000    999.000    999.000
 
  Variances
-    LENGTH            44.433     10.178      4.365      0.000
+    LENGTH            19.867      4.992      3.980      0.000
     WIDTH              0.627      0.069      9.147      0.000
 
 Latent Class 2
@@ -346,11 +346,11 @@ Latent Class 2
     WIDTH              0.886      0.110      8.026      0.000
 
  Means
-    LENGTH            49.800      2.091     23.815      0.000
+    LENGTH            32.360      1.377     23.504      0.000
     WIDTH              0.000      0.000    999.000    999.000
 
  Variances
-    LENGTH           746.695     78.588      9.501      0.000
+    LENGTH           312.346     33.252      9.393      0.000
     WIDTH              0.627      0.069      9.147      0.000
 
 Latent Class 3
@@ -408,8 +408,8 @@ Latent Class 6
 Categorical Latent Variables
 
  Means
-    C#1               -1.650      0.242     -6.833      0.000
-    C#2               -1.760      0.265     -6.643      0.000
+    C#1               -1.640      0.251     -6.529      0.000
+    C#2               -1.772      0.266     -6.662      0.000
     C#3               -0.635      0.283     -2.244      0.025
     C#4               -2.193      0.266     -8.246      0.000
     C#5                1.168      0.252      4.644      0.000
@@ -417,7 +417,7 @@ Categorical Latent Variables
 
 QUALITY OF NUMERICAL RESULTS
 
-     Condition Number for the Information Matrix              0.601E-05
+     Condition Number for the Information Matrix              0.553E-05
        (ratio of smallest to largest eigenvalue)
 
 
@@ -432,10 +432,10 @@ STDYX Standardization
 Latent Class 1
 
  LENGTH   WITH
-    WIDTH              0.168      0.021      8.142      0.000
+    WIDTH              0.251      0.031      8.061      0.000
 
  Means
-    LENGTH             2.123      0.183     11.632      0.000
+    LENGTH             2.091      0.188     11.145      0.000
     WIDTH              0.000      0.000    999.000    999.000
 
  Variances
@@ -445,10 +445,10 @@ Latent Class 1
 Latent Class 2
 
  LENGTH   WITH
-    WIDTH              0.041      0.004     11.147      0.000
+    WIDTH              0.063      0.006     11.218      0.000
 
  Means
-    LENGTH             1.822      0.069     26.567      0.000
+    LENGTH             1.831      0.067     27.454      0.000
     WIDTH              0.000      0.000    999.000    999.000
 
  Variances
@@ -516,10 +516,10 @@ STDY Standardization
 Latent Class 1
 
  LENGTH   WITH
-    WIDTH              0.168      0.021      8.142      0.000
+    WIDTH              0.251      0.031      8.061      0.000
 
  Means
-    LENGTH             2.123      0.183     11.632      0.000
+    LENGTH             2.091      0.188     11.145      0.000
     WIDTH              0.000      0.000    999.000    999.000
 
  Variances
@@ -529,10 +529,10 @@ Latent Class 1
 Latent Class 2
 
  LENGTH   WITH
-    WIDTH              0.041      0.004     11.147      0.000
+    WIDTH              0.063      0.006     11.218      0.000
 
  Means
-    LENGTH             1.822      0.069     26.567      0.000
+    LENGTH             1.831      0.067     27.454      0.000
     WIDTH              0.000      0.000    999.000    999.000
 
  Variances
@@ -603,11 +603,11 @@ Latent Class 1
     WIDTH              0.886      0.110      8.026      0.000
 
  Means
-    LENGTH            14.153      0.801     17.677      0.000
+    LENGTH             9.320      0.569     16.374      0.000
     WIDTH              0.000      0.000    999.000    999.000
 
  Variances
-    LENGTH            44.433     10.178      4.365      0.000
+    LENGTH            19.867      4.992      3.980      0.000
     WIDTH              0.627      0.069      9.147      0.000
 
 Latent Class 2
@@ -616,11 +616,11 @@ Latent Class 2
     WIDTH              0.886      0.110      8.026      0.000
 
  Means
-    LENGTH            49.800      2.091     23.815      0.000
+    LENGTH            32.360      1.377     23.504      0.000
     WIDTH              0.000      0.000    999.000    999.000
 
  Variances
-    LENGTH           746.695     78.588      9.501      0.000
+    LENGTH           312.346     33.252      9.393      0.000
     WIDTH              0.627      0.069      9.147      0.000
 
 Latent Class 3
@@ -695,8 +695,8 @@ MODEL COMMAND WITH FINAL ESTIMATES USED AS STARTING VALUES
 
      %OVERALL%
 
-     [ c#1*-1.65022 ];
-     [ c#2*-1.75972 ];
+     [ c#1*-1.63972 ];
+     [ c#2*-1.77156 ];
      [ c#3*-0.63472 ];
      [ c#4*-2.19279 ];
      [ c#5*1.16830 ];
@@ -705,20 +705,20 @@ MODEL COMMAND WITH FINAL ESTIMATES USED AS STARTING VALUES
 
      length WITH width*0.88565 (lengthwwidth3);
 
-     [ length*14.15261 ];
+     [ length*9.31998 ];
      [ width@0 ];
 
-     length*44.43321 (vlength1);
+     length*19.86667 (vlength1);
      width*0.62710 (vwidth3);
 
      %C#2%
 
      length WITH width*0.88565 (lengthwwidth3);
 
-     [ length*49.79989 ];
+     [ length*32.35952 ];
      [ width@0 ];
 
-     length*746.69519 (vlength2);
+     length*312.34650 (vlength2);
      width*0.62710 (vwidth3);
 
      %C#3%
@@ -796,9 +796,9 @@ SAVEDATA INFORMATION
   Save missing symbol        *
 
 
-     Beginning Time:  22:18:02
-        Ending Time:  22:18:17
-       Elapsed Time:  00:00:15
+     Beginning Time:  13:24:25
+        Ending Time:  13:24:39
+       Elapsed Time:  00:00:14
 
 
 

@@ -98,7 +98,7 @@ names(df)[match(c("S", "L..mm.", "W..mm.", "A..mm.", "H..mm.", "H..5mm.", "PT"),
 
 # For lines, calculate length from area divided by average diameter of a sample of lines,
 # to account for potential curvature of lines inside bounding box
-calculated_lengths <- df$area[df$category == "Line"]/0.42
+calculated_lengths <- df$area[df$category == "Line"]/0.65
 calculated_lengths[is.na(calculated_lengths)] <- df$length[df$category == "Line"][which(is.na(calculated_lengths))]
 df$length[df$category == "Line"] <- calculated_lengths
 

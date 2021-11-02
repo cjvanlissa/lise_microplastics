@@ -21,6 +21,9 @@ illegal_values <- function(x){
 
 df[c("S", "N", "L..mm.", "W..mm.")] <- lapply(df[c("S", "N", "L..mm.", "W..mm.")], as.numeric)
 
+# Fix W..m. that was hard-coded as 0.83 to .65
+df$W..mm.[df$category == "line" & df$W..mm. == 0.83] <- .65
+
 # Reorder L and W
 #all(df$L..mm. >= df$W..mm.)
 df[,c("L..mm.", "W..mm.")] <- t(apply(df[,c("L..mm.", "W..mm.")], 1, function(x){c(max(x), min(x))}))

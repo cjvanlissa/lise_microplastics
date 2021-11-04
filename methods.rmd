@@ -140,11 +140,19 @@ knitr::kable(tab_class(comp_other), caption = "Fragment classification")
 ```
 
 ```{r figclassother4, out.width="100%", fig.cap="Mixture model of fragments with free means and variances, and fixed covariances"}
-plot_bivariate(res_other$model_4_class_2)
+tmp <- plot_bivariate(res_other$model_4_class_2, return_list = TRUE)
+tmp[[1]] <- tmp[[1]] + scale_x_continuous(limits = c(0, 23), breaks = c(5, 10, 15, 20))
+tmp[[2]] <- tmp[[2]] + scale_x_continuous(limits = c(0, 23), breaks = c(5, 10, 15, 20))
+tidySEM:::merge_corplots(tmp)
+tmp
 ```
 
 ```{r figclassother5, out.width="100%", fig.cap="Mixture model of fragments with free means and variances, and fixed covariances"}
-plot_bivariate(res_other$model_4_class_3)
+tmp <- plot_bivariate(res_other$model_4_class_3, return_list = TRUE)
+tmp[[1]] <- tmp[[1]] + scale_x_continuous(limits = c(0, 23), breaks = c(5, 10, 15, 20))
+tmp[[2]] <- tmp[[2]] + scale_x_continuous(limits = c(0, 23), breaks = c(5, 10, 15, 20))
+tidySEM:::merge_corplots(tmp)
+tmp
 ```
 
 ## Combining the classes
